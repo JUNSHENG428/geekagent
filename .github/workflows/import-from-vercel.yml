@@ -20,7 +20,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # Triggered after customer-facing copy update.
           BASE="https://tool-nu-bay.vercel.app"
           files=(
             "404.html"
@@ -52,6 +51,9 @@ jobs:
             "pricing.html"
             "privacy.html"
             "robots.txt"
+            "service-worker.js"
+            "site-head.js"
+            "site-nav.js"
             "site.css"
             "sitemap.xml"
             "templates.html"
