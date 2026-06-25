@@ -40,7 +40,7 @@
       <section class="comments card">
         <div class="eyebrow">Comments</div>
         <h2>留言互动</h2>
-        <p class="muted">分享你的配置、报错或建议。当前静态版留言只保存在本机浏览器，上线可替换为 Giscus / Supabase / 自建评论 API。</p>
+        <p class="muted">分享你的配置、报错或建议。留言会先保存在当前浏览器里，适合记录自己的排查过程。</p>
         <form class="comment-form" data-comment-form>
           <input name="name" maxlength="40" placeholder="昵称（选填）">
           <textarea name="body" maxlength="800" placeholder="写下你的问题、配置经验或建议..." required></textarea>
