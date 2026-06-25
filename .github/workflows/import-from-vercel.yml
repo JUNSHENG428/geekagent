@@ -54,13 +54,18 @@ jobs:
             "site.css"
             "sitemap.xml"
             "templates.html"
-            "vercel.json"
           )
           for file in "${files[@]}"; do
             mkdir -p "$(dirname "$file")"
             curl --fail --location --silent --show-error "$BASE/$file" --output "$file"
           done
           printf '.vercel\n' > .gitignore
+          cat > vercel.json <<'JSON'
+          {
+            "cleanUrls": true,
+            "trailingSlash": false
+          }
+          JSON
       - name: Commit imported site
         shell: bash
         run: |
