@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>报错粘贴诊断 - Local Agent Wizard</title>
+  <meta name="description" content="粘贴 Ollama、Cursor MCP、Qwen-Agent、本地 AI Agent 报错，自动匹配原因和修复命令。">
+  <link rel="canonical" href="https://localagentwizard.com/diagnose.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+<nav class="nav"><div class="wrap nav-inner"><a class="brand" href="index.html"><span class="mark">L</span><span>Local Agent Wizard</span></a><div class="nav-links"><a href="local-agent-wizard.html">开始生成</a><a href="integrations.html">插件与数据库</a><a href="guides/index.html">教程</a><a href="faq.html">FAQ</a><a href="advertise.html">合作</a></div></div></nav>
+<main class="article"><div class="wrap">
+  <div class="eyebrow">Error Diagnosis</div>
+  <h1>报错粘贴诊断</h1>
+  <p class="lead">把 Ollama、Cursor MCP、Qwen-Agent 或本地 Agent 的报错粘贴进来，页面会在本地匹配原因和修复命令。</p>
+  <div class="split">
+    <section class="card">
+      <h2>粘贴报错</h2>
+      <textarea id="error-input" class="textarea" placeholder="例如：connection refused / model not found / spawn npx ENOENT / CUDA out of memory"></textarea>
+      <div class="hero-actions">
+        <button class="btn primary" onclick="diagnose()">开始诊断</button>
+        <button class="btn" onclick="loadExample()">填入示例</button>
+      </div>
+      <div id="diagnosis-result" class="result empty">等待输入报错内容。</div>
+    </section>
+    <aside class="ad-slot" data-ad-slot="diagnose-sidebar">
+      <div class="ad-label">Conversion Slot</div>
+      <h3>付费诊断入口预留</h3>
+      <p>这里可以引导用户购买一对一配置诊断、模板包或云 GPU 临时方案。</p>
+    </aside>
+  </div>
+  <section class="section">
+    <h2>诊断不准怎么办？</h2>
+    <p class="muted">当前是纯前端规则匹配。后续可以升级为：用户粘贴报错 + 选择系统 + 选择工具，生成更精确的修复步骤。</p>
+    <p><a class="btn primary" href="local-agent-wizard.html">重新生成保守配置</a> <a class="btn" href="integrations.html">查看诊断数据表</a></p>
+  </section>
+  <div data-comments="diagnose"></div>
+</div></main>
+<footer class="footer"><div class="wrap footer-grid"><span>Local Agent Wizard</span><span><a href="privacy.html">隐私</a> · <a href="faq.html">FAQ</a></span></div></footer>
+<script src="analytics.js"></script>
+<script src="ads.js"></script>
+<script src="comments.js"></script>
+<script>
+const RULES = [
+  {re:/connection refused|failed to connect|localhost:11434|ECONNREFUSED/i,title:'Ollama 服务没有启动',why:'Agent 正在连接 localhost:11434，但 Ollama 服务没有响应。',fix:'macOS: brew services start ollama\\nLinux: sudo systemctl start ollama\\nWindows: 打开 Ollama 应用\\n验证: curl http://localhost:11434/api/tags'},
+  {re:/model not found|pull model|not found.*model/i,title:'模型没有下载',why:'配置里使用了某个模型，但本机 Ollama 还没有这个模型。',fix:'查看模型: ollama list\\n下载模型: ollama pull qwen3:8b\\n如果内存较小，换成 qwen3:1.7b'},
+  {re:/out of memory|cuda.*memory|oom|killed/i,title:'内存或显存不足',why:'模型、上下文或工具链超过了当前机器的内存预算。',fix:'降级模型，例如 14B -> 8B\\n关闭浏览器/IDE/视频软件\\n暂时移除 embedding 或 playwright\\n重新用 Wizard 生成保守方案'},
+  {re:/spawn npx ENOENT|npx.*not found|node.*not found/i,title:'Node.js / npx 未安装',why:'filesystem、memory、playwright 等 MCP server 通常需要 npx 启动。',fix:'macOS: brew install node\\nWindows: 安装 https://nodejs.org/\\nLinux: sudo apt-get install -y nodejs\\n验证: node --version && npx --version'},
+  {re:/uvx.*not found|uv.*not found/i,title:'uv / uvx 未安装',why:'fetch、sqlite、embedding 等 Python MCP 工具通常需要 uvx。',fix:'macOS/Linux: curl -LsSf https://astral.sh/uv/install.sh | sh\\nWindows: powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"'},
+  {re:/permission denied|EACCES|EPERM/i,title:'目录权限不足',why:'Agent 或 MCP server 没有权限访问目标目录。',fix:'把 filesystem 路径改成你的工作目录\\n避免指向 /System、C:\\\\Windows 等系统目录\\n必要时新建 workspace 文件夹再授权'},
+  {re:/playwright.*install|browser.*not installed|chromium.*missing/i,title:'Playwright 浏览器未安装',why:'Playwright MCP 已安装，但浏览器内核还没有下载。',fix:'运行: npx playwright install chromium\\n如果内存偏小，先关闭网页自动化用途'},
+  {re:/ModuleNotFoundError.*qwen_agent|No module named.*qwen_agent/i,title:'Qwen-Agent Python 依赖缺失',why:'当前 Python 环境里没有安装 qwen_agent。',fix:'python -m pip install -U "qwen-agent[mcp,gui,rag,code_interpreter]"\\n验证: python -c "import qwen_agent; print(\\\"OK\\\")"'},
+  {re:/json.*parse|unexpected token|invalid json/i,title:'MCP JSON 格式错误',why:'配置粘贴时可能少了逗号、括号或层级不对。',fix:'重新从 Wizard 复制完整 MCP 配置\\n确认外层是 { "mcpServers": { ... } }\\n不要只复制里面某一段'}
+];
+function diagnose(){
+  const input = document.getElementById('error-input').value.trim();
+  const result = document.getElementById('diagnosis-result');
+  if(!input){ result.className='result empty'; result.textContent='请先粘贴报错内容。'; return; }
+  const match = RULES.find(rule=>rule.re.test(input));
+  window.lawTrack && window.lawTrack('diagnose_run', {matched: Boolean(match)});
+  if(!match){
+    result.className='result';
+    result.innerHTML = '<h3>暂未匹配到明确原因</h3><p>建议先检查 Ollama 是否启动、模型是否下载、Node/uv 是否安装，并尝试用 Wizard 生成更保守配置。</p><pre>curl http://localhost:11434/api/tags\\nollama list\\nnode --version\\nuvx --version</pre>';
+    return;
+  }
+  result.className='result';
+  result.innerHTML = `<h3>${match.title}</h3><p><strong>人话解释：</strong>${match.why}</p><p><strong>怎么修：</strong></p><pre>${match.fix}</pre>`;
+}
+function loadExample(){
+  document.getElementById('error-input').value = 'Error: connect ECONNREFUSED 127.0.0.1:11434';
+  diagnose();
+}
+</script>
+</body></html>

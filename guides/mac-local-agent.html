@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mac 如何搭建本地 AI Agent - Apple Silicon 教程</title>
+  <meta name="description" content="Mac M1/M2/M3/M4 用户如何用 Ollama、Cursor MCP 和 Qwen-Agent 搭建本地 AI Agent。">
+  <link rel="canonical" href="https://localagentwizard.com/guides/mac-local-agent.html">
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body>
+<nav class="nav"><div class="wrap nav-inner"><a class="brand" href="../index.html"><span class="mark">L</span><span>Local Agent Wizard</span></a><div class="nav-links"><a href="../local-agent-wizard.html">开始生成</a><a href="../diagnose.html">报错诊断</a><a href="index.html">教程</a><a href="../advertise.html">合作</a><a href="../faq.html">FAQ</a></div></div></nav>
+<main class="article"><div class="wrap">
+  <div class="eyebrow">Mac Guide</div>
+  <h1>Mac 如何搭建本地 AI Agent</h1>
+  <p class="lead">Apple Silicon 的优势是统一内存和能效。关键不是选最大模型，而是让模型、工具链和系统占用保持平衡。</p>
+  <div class="toc"><a class="pill" href="#memory">内存选择</a><a class="pill" href="#stack">工具栈</a><a class="pill" href="#steps">步骤</a><a class="pill" href="#ads">硬件建议</a></div>
+  <h2 id="memory">内存怎么选</h2>
+  <ul>
+    <li>8GB：只建议轻量聊天和简单工具调用。</li>
+    <li>16GB：适合 Qwen3 8B Q4，能做文件处理和代码辅助。</li>
+    <li>32GB：可以尝试 14B 模型和 RAG。</li>
+    <li>64GB+：适合多工具 Agent、长上下文和更大模型。</li>
+  </ul>
+  <h2 id="stack">推荐工具栈</h2>
+  <p>新手优先选择 Ollama + Cursor MCP。需要 Python Agent 时再加入 Qwen-Agent。网页自动化任务再安装 Playwright。</p>
+  <pre>brew install ollama node
+brew services start ollama
+ollama pull qwen3:8b</pre>
+  <h2 id="steps">最快路径</h2>
+  <ol>
+    <li>打开 <a href="../local-agent-wizard.html">Local Agent Wizard</a>。</li>
+    <li>设备选择 Mac，填入内存。</li>
+    <li>选择用途模板，例如代码审查助手或文件整理助手。</li>
+    <li>复制安装命令和 MCP 配置。</li>
+    <li>运行健康检查，确认 Ollama 和 MCP 都能工作。</li>
+  </ol>
+  <div class="notice">建议先用小任务测试：列出工作目录文件，不要修改任何文件。确认工具链可用后，再让 Agent 写入或批量处理。</div>
+  <h2 id="ads">硬件升级建议</h2>
+  <div class="ad-slot" data-ad-slot="guide-affiliate"></div>
+  <div data-comments="guides/mac-local-agent"></div>
+</div></main>
+<footer class="footer"><div class="wrap footer-grid"><span>Local Agent Wizard</span><span><a href="index.html">教程目录</a> · <a href="../local-agent-wizard.html">生成配置</a></span></div></footer>
+<script src="../analytics.js"></script>
+<script src="../ads.js"></script>
+<script src="../comments.js"></script>
+</body></html>

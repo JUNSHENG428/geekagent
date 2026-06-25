@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>插件与数据库接入 - Local Agent Wizard</title>
+  <meta name="description" content="Local Agent Wizard 的数据库设计、Supabase 表结构、评论、订阅、支付、邮件、分析和广告插件接入建议。">
+  <link rel="canonical" href="https://localagentwizard.com/integrations.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+<nav class="nav"><div class="wrap nav-inner"><a class="brand" href="index.html"><span class="mark">L</span><span>Local Agent Wizard</span></a><div class="nav-links"><a href="local-agent-wizard.html">开始生成</a><a href="templates.html">模板包</a><a href="diagnose.html">报错诊断</a><a href="pricing.html">定价</a><a href="faq.html">FAQ</a></div></div></nav>
+<main>
+  <section class="hero"><div class="wrap">
+    <div class="eyebrow">Integrations & Database</div>
+    <h1>先接数据闭环，再接商业化插件。</h1>
+    <p class="lead">这个站点当前能静态运行。下一步最值得做的是把订阅、评论、诊断、配置生成和模板订单统一入库，再按转化路径接邮件、支付和分析。</p>
+    <div class="hero-actions"><a class="btn primary" href="docs/database-schema.sql">查看 SQL Schema</a><a class="btn" href="docs/plugin-roadmap.md">查看接入路线文档</a></div>
+  </div></section>
+
+  <section class="section"><div class="wrap split">
+    <div>
+      <h2>推荐第一阶段插件</h2>
+      <p class="lead">先不要一次性接太多。MVP 阶段的目标是确认谁在用、哪里卡住、谁愿意付费。</p>
+      <ul class="feature-list">
+        <li><strong>Supabase：</strong>Postgres 数据库、认证、RLS、Edge Functions，承接订阅、评论、配置事件和诊断工单。</li>
+        <li><strong>Resend：</strong>发送模板更新、诊断预约确认、购买交付邮件。</li>
+        <li><strong>Stripe / Lemon Squeezy：</strong>出售模板包和诊断服务，先用 Payment Link 降低开发量。</li>
+        <li><strong>PostHog：</strong>分析生成、下载、诊断、订阅、购买点击等转化事件。</li>
+        <li><strong>Giscus：</strong>如果暂时不做自建评论，可用 GitHub Discussions 承接教程页评论。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Decision</div>
+      <h3>我建议先接 Supabase + Resend</h3>
+      <p>原因很简单：这两个能立刻把邮箱、配置反馈、诊断线索和后续模板交付串起来。支付可以等模板包内容稳定后再接。</p>
+    </div>
+  </div></section>
+
+  <section class="section"><div class="wrap">
+    <h2>数据表设计</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>表</th><th>用途</th><th>关键字段</th><th>阶段</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag">profiles</span></td><td>登录用户或付费客户档案</td><td>email, role, source, consent_at</td><td>MVP+</td></tr>
+          <tr><td><span class="tag">leads</span></td><td>订阅、候补名单、广告咨询线索</td><td>email, intent, source_page, hardware_profile</td><td>MVP</td></tr>
+          <tr><td><span class="tag">wizard_runs</span></td><td>匿名配置生成记录，用于优化推荐规则</td><td>os, memory_gb, gpu_vram_gb, use_case, recommendation</td><td>MVP</td></tr>
+          <tr><td><span class="tag">diagnostics</span></td><td>报错诊断记录和高频问题统计</td><td>tool, error_signature, matched_rule, user_feedback</td><td>MVP</td></tr>
+          <tr><td><span class="tag">comments</span></td><td>教程、FAQ、诊断页评论和回复</td><td>page_id, parent_id, author_name, body, status</td><td>MVP+</td></tr>
+          <tr><td><span class="tag">orders</span></td><td>模板包、诊断服务、企业咨询订单</td><td>provider, provider_order_id, product_key, amount_cents, status</td><td>Paid</td></tr>
+          <tr><td><span class="tag">template_entitlements</span></td><td>用户购买后可访问的模板权益</td><td>profile_id, product_key, expires_at</td><td>Paid</td></tr>
+          <tr><td><span class="tag">events</span></td><td>轻量产品事件备份，可与 PostHog 并行</td><td>event_name, path, payload, anonymous_id</td><td>MVP</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div></section>
+
+  <section class="section"><div class="wrap">
+    <h2>插件优先级</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>优先级</th><th>插件/服务</th><th>接它解决什么</th><th>暂时不接的风险</th></tr></thead>
+        <tbody>
+          <tr><td>P0</td><td>Supabase</td><td>数据库、RLS、评论、订阅、诊断工单</td><td>用户反馈散落在邮箱和 localStorage</td></tr>
+          <tr><td>P0</td><td>Resend</td><td>邮件订阅、购买交付、诊断确认</td><td>无法自动触达高意图用户</td></tr>
+          <tr><td>P1</td><td>PostHog 或 Vercel Analytics</td><td>看清生成、诊断、购买点击漏斗</td><td>不知道哪些页面真正转化</td></tr>
+          <tr><td>P1</td><td>Stripe / Lemon Squeezy</td><td>模板包和诊断付费</td><td>商业化只能靠手动收款</td></tr>
+          <tr><td>P2</td><td>Giscus</td><td>无需自建审核后台的教程评论</td><td>社区讨论沉淀慢</td></tr>
+          <tr><td>P2</td><td>Cloudflare Turnstile</td><td>保护评论、订阅、诊断表单</td><td>表单开放后容易被垃圾提交</td></tr>
+          <tr><td>P3</td><td>Algolia / Pagefind</td><td>教程和报错库搜索</td><td>内容多了以后查找效率下降</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div></section>
+
+  <section class="section"><div class="wrap split">
+    <div class="card">
+      <h2>接入顺序</h2>
+      <ol>
+        <li>建 Supabase 项目，执行 <code>docs/database-schema.sql</code>。</li>
+        <li>把 newsletter、comments、diagnose、wizard 事件接到 Edge Function。</li>
+        <li>接 Resend，把订阅和诊断预约自动回信。</li>
+        <li>模板包稳定后再接 Stripe / Lemon Squeezy。</li>
+        <li>最后补 PostHog 漏斗和 Turnstile 防滥用。</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h2>前端改造点</h2>
+      <ul>
+        <li>保留当前纯前端 fallback，数据库失败时不阻塞核心工具。</li>
+        <li>所有用户可识别数据必须有同意文案和隐私说明。</li>
+        <li>评论默认进入 pending 状态，审核后展示。</li>
+        <li>配置生成记录默认匿名化，不保存原始敏感路径。</li>
+      </ul>
+    </div>
+  </div></section>
+</main>
+<footer class="footer"><div class="wrap footer-grid"><span>Local Agent Wizard</span><span><a href="index.html">首页</a> · <a href="privacy.html">隐私</a> · <a href="advertise.html">合作</a></span></div></footer>
+<script src="analytics.js"></script>
+</body></html>

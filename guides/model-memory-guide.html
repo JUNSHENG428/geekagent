@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>8GB / 16GB / 32GB 内存能跑什么本地 AI 模型？</title>
+  <meta name="description" content="按内存和显存预算推荐 Qwen、Phi、Mistral 等本地模型，并解释工具链和 KV Cache 为什么也会占内存。">
+  <link rel="canonical" href="https://localagentwizard.com/guides/model-memory-guide.html">
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body>
+<nav class="nav"><div class="wrap nav-inner"><a class="brand" href="../index.html"><span class="mark">L</span><span>Local Agent Wizard</span></a><div class="nav-links"><a href="../local-agent-wizard.html">开始生成</a><a href="../diagnose.html">报错诊断</a><a href="index.html">教程</a><a href="../advertise.html">合作</a><a href="../faq.html">FAQ</a></div></div></nav>
+<main class="article"><div class="wrap">
+  <div class="eyebrow">Model Guide</div>
+  <h1>不同内存能跑什么本地 AI 模型？</h1>
+  <p class="lead">本地 Agent 不只消耗模型内存，还要给操作系统、工具链和 KV Cache 留空间。</p>
+  <h2>简单规则</h2>
+  <p>可分配给模型的内存大约是：总内存减去系统占用后，再乘以 70%。剩余空间留给工具链和上下文。</p>
+  <h2>推荐表</h2>
+  <ul>
+    <li>小于 5GB：Qwen3 1.7B / Phi-4-mini，适合轻量对话。</li>
+    <li>5-8GB：Qwen3 8B Q4_K_M，适合基础 Agent。</li>
+    <li>8-12GB：Qwen2.5-Coder 14B Q4_K_M，适合代码辅助。</li>
+    <li>12-20GB：Qwen3 14B / Mistral 22B Q4，适合复杂任务。</li>
+    <li>20GB+：Qwen3 30B-A3B MoE，适合高质量推理。</li>
+  </ul>
+  <h2>不要只看模型大小</h2>
+  <p>RAG embedding、Playwright 浏览器、代码解释器都会额外占内存。稳定性比参数量更重要。</p>
+  <div class="notice">如果你不确定，直接用 Wizard 生成保守方案，再逐步升级模型和工具链。</div>
+  <p><a class="btn primary" href="../local-agent-wizard.html">按我的电脑推荐模型</a></p>
+  <div data-comments="guides/model-memory-guide"></div>
+</div></main>
+<footer class="footer"><div class="wrap footer-grid"><span>Local Agent Wizard</span><span><a href="index.html">教程目录</a></span></div></footer>
+<script src="../analytics.js"></script>
+<script src="../comments.js"></script>
+</body></html>

@@ -1,0 +1,10 @@
+{
+  "name": "Local Agent Wizard",
+  "short_name": "Agent Wizard",
+  "description": "Generate local AI Agent configurations for Ollama, Cursor MCP, Qwen-Agent and Loop Engineering.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1115",
+  "theme_color": "#4f98ff",
+  "icons": []
+}

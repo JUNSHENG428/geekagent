@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ollama 常见报错解决合集</title>
+  <meta name="description" content="Ollama connection refused、model not found、out of memory、端口连接失败等常见错误的人话解释和修复命令。">
+  <link rel="canonical" href="https://localagentwizard.com/guides/ollama-errors.html">
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body>
+<nav class="nav"><div class="wrap nav-inner"><a class="brand" href="../index.html"><span class="mark">L</span><span>Local Agent Wizard</span></a><div class="nav-links"><a href="../local-agent-wizard.html">开始生成</a><a href="../diagnose.html">报错诊断</a><a href="index.html">教程</a><a href="../advertise.html">合作</a><a href="../faq.html">FAQ</a></div></div></nav>
+<main class="article"><div class="wrap">
+  <div class="eyebrow">Troubleshooting</div>
+  <h1>Ollama 常见报错解决合集</h1>
+  <p class="lead">很多本地 Agent 失败不是模型问题，而是服务没启动、模型没下载或依赖缺失。</p>
+  <h2>connection refused</h2>
+  <p>人话解释：Ollama 服务没启动，或者端口不是 11434。</p>
+  <pre>curl http://localhost:11434/api/tags
+brew services start ollama
+sudo systemctl start ollama</pre>
+  <h2>model not found</h2>
+  <p>人话解释：配置里写了模型，但本机还没下载。</p>
+  <pre>ollama list
+ollama pull qwen3:8b</pre>
+  <h2>out of memory</h2>
+  <p>人话解释：模型、上下文或工具链超过内存/显存预算。</p>
+  <ul>
+    <li>降级模型，例如从 14B 换成 8B。</li>
+    <li>关闭浏览器、IDE、视频软件。</li>
+    <li>先移除 embedding 或 playwright。</li>
+  </ul>
+  <h2>Agent 能聊天但不能调用工具</h2>
+  <p>通常是 MCP server 没启动、command 不存在或路径不对。先只保留 filesystem 做最小测试。</p>
+  <div class="ad-slot" data-ad-slot="diagnose-sidebar"></div>
+  <p><a class="btn primary" href="../local-agent-wizard.html">重新生成更安全配置</a></p>
+  <div data-comments="guides/ollama-errors"></div>
+</div></main>
+<footer class="footer"><div class="wrap footer-grid"><span>Local Agent Wizard</span><span><a href="index.html">教程目录</a></span></div></footer>
+<script src="../analytics.js"></script>
+<script src="../ads.js"></script>
+<script src="../comments.js"></script>
+</body></html>

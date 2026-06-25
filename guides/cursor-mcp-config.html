@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cursor MCP 配置教程 - 本地 Agent 工具调用</title>
+  <meta name="description" content="如何把 Local Agent Wizard 生成的 mcpServers JSON 粘贴到 Cursor，并验证 filesystem、fetch、playwright 等 MCP 工具。">
+  <link rel="canonical" href="https://localagentwizard.com/guides/cursor-mcp-config.html">
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body>
+<nav class="nav"><div class="wrap nav-inner"><a class="brand" href="../index.html"><span class="mark">L</span><span>Local Agent Wizard</span></a><div class="nav-links"><a href="../local-agent-wizard.html">开始生成</a><a href="../diagnose.html">报错诊断</a><a href="index.html">教程</a><a href="../advertise.html">合作</a><a href="../faq.html">FAQ</a></div></div></nav>
+<main class="article"><div class="wrap">
+  <div class="eyebrow">Cursor MCP</div>
+  <h1>Cursor MCP 配置教程</h1>
+  <p class="lead">MCP 让 Cursor 可以调用本地文件系统、网页抓取、数据库和记忆工具。配置正确后，Agent 才能真正处理本地任务。</p>
+  <h2>配置步骤</h2>
+  <ol>
+    <li>打开 <a href="../local-agent-wizard.html">配置生成器</a>。</li>
+    <li>目标工具选择 Cursor IDE。</li>
+    <li>复制 MCP 配置 Tab 中的 JSON。</li>
+    <li>打开 Cursor 设置中的 MCP 配置入口。</li>
+    <li>粘贴并保存，然后重启或刷新 MCP。</li>
+  </ol>
+  <h2>最小配置示例</h2>
+  <pre>{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "./workspace"]
+    }
+  }
+}</pre>
+  <h2>验证方式</h2>
+  <p>先让 Cursor 执行低风险任务：列出工作目录文件。不要一开始就让它删除、覆盖或批量移动文件。</p>
+  <div class="notice">如果看到 spawn npx ENOENT，通常是 Node.js 没装。先安装 Node，再重试。</div>
+  <p><a class="btn primary" href="../local-agent-wizard.html">生成 Cursor MCP 配置</a></p>
+  <div data-comments="guides/cursor-mcp-config"></div>
+</div></main>
+<footer class="footer"><div class="wrap footer-grid"><span>Local Agent Wizard</span><span><a href="index.html">教程目录</a></span></div></footer>
+<script src="../analytics.js"></script>
+<script src="../comments.js"></script>
+</body></html>

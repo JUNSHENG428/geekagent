@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FAQ - Local Agent Wizard</title>
+  <meta name="description" content="Local Agent Wizard 常见问题：是否上传数据、模型怎么选、Cursor MCP 怎么配置、报错怎么处理。">
+  <link rel="canonical" href="https://localagentwizard.com/faq.html">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="site.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Local Agent Wizard 会上传我的电脑信息吗？","acceptedAnswer":{"@type":"Answer","text":"不会。当前版本是纯客户端静态页面，配置计算在浏览器本地完成。"}},{"@type":"Question","name":"8GB 内存能跑本地 Agent 吗？","acceptedAnswer":{"@type":"Answer","text":"可以，但只建议轻量对话和简单工具调用，不建议复杂网页自动化或 RAG。"}},{"@type":"Question","name":"生成的 MCP 配置可以用于 Cursor 吗？","acceptedAnswer":{"@type":"Answer","text":"可以。选择 Cursor IDE 作为目标工具后，复制 MCP 配置 Tab 的 JSON 粘贴到 Cursor MCP 设置即可。"}}]}
+  </script>
+</head>
+<body>
+<nav class="nav"><div class="wrap nav-inner"><a class="brand" href="index.html"><span class="mark">L</span><span>Local Agent Wizard</span></a><div class="nav-links"><a href="local-agent-wizard.html">开始生成</a><a href="integrations.html">插件与数据库</a><a href="diagnose.html">报错诊断</a><a href="guides/index.html">教程</a><a href="advertise.html">合作</a><a href="privacy.html">隐私</a></div></div></nav>
+<main class="article"><div class="wrap">
+  <div class="eyebrow">FAQ</div>
+  <h1>常见问题</h1>
+  <h2>这个工具会上传我的数据吗？</h2>
+  <p>不会。当前版本是纯客户端静态工具，所有推荐和模板生成都在浏览器里完成。</p>
+  <h2>推荐结果一定准确吗？</h2>
+  <p>它是基于规则表的保守估算。不同系统负载、上下文长度和后台应用都会影响实际表现。</p>
+  <h2>为什么要留 30% 内存？</h2>
+  <p>因为工具链、KV Cache、浏览器自动化、系统后台进程都会占内存。本地 Agent 要稳定，不能把内存全部给模型。</p>
+  <h2>Cursor MCP 配置失败怎么办？</h2>
+  <p>先检查 Node.js、npx、uvx 是否安装，再只保留 filesystem 做最小测试。也可以查看 <a href="guides/cursor-mcp-config.html">Cursor MCP 教程</a>。</p>
+  <h2>可以接广告吗？</h2>
+  <p>可以，但建议广告和用户需求强相关，例如本地 AI 硬件、云 GPU、AI IDE、课程和配置诊断服务。合作方式见 <a href="advertise.html">广告合作页</a>。</p>
+  <h2>数据库和插件应该先接什么？</h2>
+  <p>建议先接 Supabase 和 Resend，先沉淀订阅、评论、配置生成和诊断线索。支付、分析、反垃圾插件可以按商业化阶段逐步接入，详见 <a href="integrations.html">插件与数据库方案</a>。</p>
+  <h2>付费模板包和免费工具有什么区别？</h2>
+  <p>免费工具生成基础配置；<a href="templates.html">高级模板包</a>提供真实场景 Prompt、Loop Playbook、验收标准和故障排查清单。</p>
+  <h2>可以预约配置诊断吗？</h2>
+  <p>可以。适合已经遇到 Ollama、MCP、Python 环境问题，或者需要根据硬件做一套稳定方案的用户。见 <a href="pricing.html">定价页</a>。</p>
+  <p><a class="btn primary" href="local-agent-wizard.html">开始生成配置</a></p>
+  <div data-comments="faq"></div>
+</div></main>
+<footer class="footer"><div class="wrap footer-grid"><span>Local Agent Wizard</span><span><a href="index.html">首页</a> · <a href="privacy.html">隐私</a></span></div></footer>
+<script src="analytics.js"></script>
+<script src="comments.js"></script>
+</body></html>

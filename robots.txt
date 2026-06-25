@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://localagentwizard.com/sitemap.xml
+
+# AI-friendly site summary
+Allow: /llms.txt

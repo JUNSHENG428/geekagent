@@ -1,0 +1,32 @@
+# Local Agent Wizard
+
+Local Agent Wizard is a static web tool for generating local AI Agent configurations.
+
+## Core Pages
+
+- Home: https://localagentwizard.com/
+- Wizard: https://localagentwizard.com/local-agent-wizard.html
+- Error Diagnosis: https://localagentwizard.com/diagnose.html
+- Guides: https://localagentwizard.com/guides/
+- Templates: https://localagentwizard.com/templates.html
+- Pricing: https://localagentwizard.com/pricing.html
+
+## What This Site Helps With
+
+- Recommending local AI models based on RAM/VRAM
+- Generating Ollama and Qwen-Agent setup commands
+- Creating Cursor MCP configuration JSON
+- Producing Loop Engineering playbooks
+- Diagnosing common Ollama, MCP, and local agent errors
+
+## Useful Guides
+
+- Mac local AI Agent setup: https://localagentwizard.com/guides/mac-local-agent.html
+- Windows NVIDIA local AI Agent setup: https://localagentwizard.com/guides/windows-nvidia-agent.html
+- Cursor MCP configuration: https://localagentwizard.com/guides/cursor-mcp-config.html
+- Ollama error fixes: https://localagentwizard.com/guides/ollama-errors.html
+- Model memory guide: https://localagentwizard.com/guides/model-memory-guide.html
+
+## Privacy
+
+The current version runs client-side. Generated configurations, comments, and diagnostics are not uploaded by default.

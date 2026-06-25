@@ -1,0 +1,2278 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local Agent Wizard</title>
+<meta name="description" content="输入电脑配置和使用场景，自动生成 Ollama、Cursor MCP、Qwen-Agent、安装命令、健康检查和 Loop Engineering 配置包。">
+<meta name="keywords" content="Local Agent Wizard,Ollama 配置,Cursor MCP,Qwen-Agent,本地 AI Agent,Loop Engineering">
+<link rel="canonical" href="https://localagentwizard.com/local-agent-wizard.html">
+<meta property="og:title" content="Local Agent Wizard - 本地 AI Agent 配置生成器">
+<meta property="og:description" content="5 分钟生成可运行的本地 AI Agent 配置包。">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600,700&f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ──────────────────────────────────────────────────────────── */
+:root,[data-theme="light"]{
+  --color-bg:#f7f6f2;--color-surface:#f9f8f5;--color-surface-2:#fbfbf9;
+  --color-surface-offset:#f0ede8;--color-surface-dynamic:#e6e4df;
+  --color-divider:#dcd9d5;--color-border:#d4d1ca;
+  --color-text:#28251d;--color-text-muted:#7a7974;--color-text-faint:#bab9b4;
+  --color-primary:#01696f;--color-primary-hover:#0c4e54;
+  --color-primary-highlight:#cedcd8;
+  --color-success:#437a22;--color-success-highlight:#d4dfcc;
+  --color-warning:#964219;--color-warning-highlight:#ddcfc6;
+  --color-error:#a12c7b;--color-error-highlight:#e0ced7;
+  --color-orange:#da7101;
+  --shadow-sm:0 1px 2px oklch(0.2 0.01 80/0.06);
+  --shadow-md:0 4px 12px oklch(0.2 0.01 80/0.08);
+  --shadow-lg:0 12px 32px oklch(0.2 0.01 80/0.14);
+  --radius-sm:0.375rem;--radius-md:0.5rem;--radius-lg:0.75rem;--radius-xl:1rem;--radius-full:9999px;
+  --transition:180ms cubic-bezier(0.16,1,0.3,1);
+  --font-body:'Satoshi','Inter',sans-serif;
+  --font-mono:'JetBrains Mono','Fira Code',monospace;
+  --font-ui:'General Sans','Inter',sans-serif;
+  --text-xs:clamp(0.75rem,0.7rem + 0.25vw,0.875rem);
+  --text-sm:clamp(0.875rem,0.8rem + 0.35vw,1rem);
+  --text-base:clamp(1rem,0.95rem + 0.25vw,1.125rem);
+  --text-lg:clamp(1.125rem,1rem + 0.75vw,1.5rem);
+  --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
+  --text-2xl:clamp(2rem,1.2rem + 2.5vw,3.5rem);
+  --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;
+  --space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;
+  --space-12:3rem;--space-16:4rem;
+}
+[data-theme="dark"]{
+  --color-bg:#111110;--color-surface:#1a1917;--color-surface-2:#1f1e1c;
+  --color-surface-offset:#161513;--color-surface-dynamic:#2a2926;
+  --color-divider:#252422;--color-border:#2e2d2b;
+  --color-text:#d0ceca;--color-text-muted:#787674;--color-text-faint:#4e4d4b;
+  --color-primary:#4f98a3;--color-primary-hover:#3a8490;
+  --color-primary-highlight:#1e3033;
+  --color-success:#6daa45;--color-success-highlight:#1e2e16;
+  --color-warning:#bb653b;--color-warning-highlight:#2e1c10;
+  --color-error:#d163a7;--color-error-highlight:#2a1220;
+  --color-orange:#fdab43;
+  --shadow-sm:0 1px 3px oklch(0 0 0/0.28);
+  --shadow-md:0 4px 16px oklch(0 0 0/0.36);
+  --shadow-lg:0 12px 40px oklch(0 0 0/0.5);
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme]){
+  --color-bg:#111110;--color-surface:#1a1917;--color-surface-2:#1f1e1c;
+  --color-surface-offset:#161513;--color-surface-dynamic:#2a2926;
+  --color-divider:#252422;--color-border:#2e2d2b;
+  --color-text:#d0ceca;--color-text-muted:#787674;--color-text-faint:#4e4d4b;
+  --color-primary:#4f98a3;--color-primary-hover:#3a8490;
+  --color-primary-highlight:#1e3033;
+  --color-success:#6daa45;--color-success-highlight:#1e2e16;
+  --color-warning:#bb653b;--color-warning-highlight:#2e1c10;
+  --color-error:#d163a7;--color-error-highlight:#2a1220;
+  --color-orange:#fdab43;
+  --shadow-sm:0 1px 3px oklch(0 0 0/0.28);
+  --shadow-md:0 4px 16px oklch(0 0 0/0.36);
+  --shadow-lg:0 12px 40px oklch(0 0 0/0.5);
+}}
+
+/* ─── RESET ───────────────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{min-height:100dvh;font-family:var(--font-body);font-size:var(--text-base);
+  color:var(--color-text);background:var(--color-bg);line-height:1.6}
+img,svg{display:block;max-width:100%}
+button{cursor:pointer;border:none;background:none;font:inherit;color:inherit}
+ul{list-style:none}
+:focus-visible{outline:2px solid var(--color-primary);outline-offset:3px;border-radius:var(--radius-sm)}
+a,button,[role="button"]{transition:color var(--transition),background var(--transition),
+  border-color var(--transition),box-shadow var(--transition),opacity var(--transition)}
+
+/* ─── LAYOUT ──────────────────────────────────────────────────────────── */
+.app{min-height:100dvh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:100;background:var(--color-surface);
+  border-bottom:1px solid var(--color-border);
+  padding:var(--space-3) var(--space-6);
+  display:flex;align-items:center;justify-content:space-between}
+.topbar-brand{display:flex;align-items:center;gap:var(--space-3)}
+.logo-mark{width:28px;height:28px;flex-shrink:0}
+.brand-name{font-family:var(--font-ui);font-weight:600;font-size:var(--text-base);
+  letter-spacing:-0.01em}
+.brand-badge{font-size:var(--text-xs);background:var(--color-primary-highlight);
+  color:var(--color-primary);padding:2px var(--space-2);border-radius:var(--radius-full);
+  font-weight:500}
+.topbar-actions{display:flex;align-items:center;gap:var(--space-3)}
+.topbar-link{font-size:var(--text-xs);font-weight:600;color:var(--color-text-muted);
+  text-decoration:none;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md)}
+.topbar-link:hover{background:var(--color-surface-dynamic);color:var(--color-text)}
+.theme-toggle{width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+  border-radius:var(--radius-md);color:var(--color-text-muted)}
+.theme-toggle:hover{background:var(--color-surface-dynamic);color:var(--color-text)}
+
+.main{flex:1;max-width:900px;margin:0 auto;width:100%;padding:var(--space-10) var(--space-6)}
+
+/* ─── HERO ───────────────────────────────────────────────────────────── */
+.hero{text-align:center;padding-bottom:var(--space-10)}
+.hero-eyebrow{font-size:var(--text-xs);font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--color-primary);margin-bottom:var(--space-4)}
+.hero-title{font-size:var(--text-2xl);font-weight:700;letter-spacing:-.03em;
+  line-height:1.1;margin-bottom:var(--space-5);color:var(--color-text)}
+.hero-title span{color:var(--color-primary)}
+.hero-desc{font-size:var(--text-base);color:var(--color-text-muted);max-width:55ch;
+  margin:0 auto var(--space-6)}
+
+/* ─── PROGRESS STEPPER ───────────────────────────────────────────────── */
+.stepper{display:flex;align-items:center;justify-content:center;gap:0;
+  margin-bottom:var(--space-10)}
+.step-item{display:flex;align-items:center;gap:var(--space-2)}
+.step-circle{width:32px;height:32px;border-radius:var(--radius-full);
+  display:flex;align-items:center;justify-content:center;
+  font-size:var(--text-xs);font-weight:600;font-family:var(--font-ui);
+  border:1.5px solid var(--color-border);
+  background:var(--color-surface);color:var(--color-text-muted);
+  transition:all var(--transition)}
+.step-label{font-size:var(--text-xs);color:var(--color-text-muted);font-weight:500;
+  white-space:nowrap;transition:color var(--transition)}
+.step-connector{width:48px;height:1.5px;background:var(--color-border);margin:0 var(--space-2);
+  transition:background var(--transition)}
+.step-item.active .step-circle{background:var(--color-primary);border-color:var(--color-primary);
+  color:#fff;box-shadow:0 0 0 3px var(--color-primary-highlight)}
+.step-item.active .step-label{color:var(--color-text)}
+.step-item.done .step-circle{background:var(--color-success-highlight);
+  border-color:var(--color-success);color:var(--color-success)}
+.step-item.done .step-label{color:var(--color-text-muted)}
+.step-item.done + .step-connector{background:var(--color-success)}
+
+/* ─── CARD ───────────────────────────────────────────────────────────── */
+.card{background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-xl);padding:var(--space-8);box-shadow:var(--shadow-sm)}
+.card-title{font-size:var(--text-lg);font-weight:600;letter-spacing:-.02em;
+  margin-bottom:var(--space-2)}
+.card-desc{font-size:var(--text-sm);color:var(--color-text-muted);margin-bottom:var(--space-6)}
+
+/* ─── FORM ELEMENTS ──────────────────────────────────────────────────── */
+.field{margin-bottom:var(--space-5)}
+.field label{display:block;font-size:var(--text-sm);font-weight:500;
+  color:var(--color-text-muted);margin-bottom:var(--space-2)}
+.field label span{color:var(--color-primary)}
+
+.chip-group{display:flex;flex-wrap:wrap;gap:var(--space-2)}
+.chip{display:flex;align-items:center;gap:var(--space-2);
+  padding:var(--space-2) var(--space-4);
+  border-radius:var(--radius-full);border:1.5px solid var(--color-border);
+  font-size:var(--text-sm);font-weight:500;cursor:pointer;
+  background:var(--color-surface-2);color:var(--color-text-muted);
+  transition:all var(--transition)}
+.chip:hover{border-color:var(--color-primary);color:var(--color-text);
+  background:var(--color-surface-dynamic)}
+.chip.selected{border-color:var(--color-primary);background:var(--color-primary-highlight);
+  color:var(--color-primary)}
+.chip-icon{font-size:1rem;line-height:1}
+
+.select-wrapper{position:relative}
+.select-wrapper select{width:100%;appearance:none;padding:var(--space-3) var(--space-4);
+  background:var(--color-surface-2);border:1.5px solid var(--color-border);
+  border-radius:var(--radius-md);font-size:var(--text-sm);font-family:var(--font-body);
+  color:var(--color-text);cursor:pointer;transition:border-color var(--transition)}
+.select-wrapper select:hover,.select-wrapper select:focus{border-color:var(--color-primary);outline:none}
+.select-arrow{position:absolute;right:var(--space-4);top:50%;transform:translateY(-50%);
+  pointer-events:none;color:var(--color-text-muted);font-size:.75rem}
+.text-input{width:100%;padding:var(--space-3) var(--space-4);
+  background:var(--color-surface-2);border:1.5px solid var(--color-border);
+  border-radius:var(--radius-md);font-size:var(--text-sm);font-family:var(--font-body);
+  color:var(--color-text);transition:border-color var(--transition)}
+.text-input:hover,.text-input:focus{border-color:var(--color-primary);outline:none}
+.field-hint{font-size:var(--text-xs);color:var(--color-text-faint);margin-top:var(--space-2)}
+
+/* Slider */
+.slider-wrap{padding:var(--space-2) 0}
+.mem-slider{width:100%;-webkit-appearance:none;appearance:none;
+  height:4px;border-radius:var(--radius-full);background:var(--color-border);
+  outline:none;cursor:pointer}
+.mem-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+  width:18px;height:18px;border-radius:var(--radius-full);background:var(--color-primary);
+  box-shadow:0 0 0 3px var(--color-primary-highlight);cursor:grab;transition:transform .15s}
+.mem-slider::-webkit-slider-thumb:active{cursor:grabbing;transform:scale(1.2)}
+.slider-labels{display:flex;justify-content:space-between;margin-top:var(--space-2)}
+.slider-labels span{font-size:var(--text-xs);color:var(--color-text-faint)}
+
+/* Autonomy slider */
+.auto-labels{display:flex;justify-content:space-between;margin-top:var(--space-2)}
+.auto-labels span{font-size:var(--text-xs);color:var(--color-text-faint);max-width:80px;text-align:center}
+
+/* ─── MEMORY BUDGET PANEL ────────────────────────────────────────────── */
+.budget-panel{background:var(--color-surface-2);border:1px solid var(--color-border);
+  border-radius:var(--radius-lg);padding:var(--space-5);margin-top:var(--space-5)}
+.budget-title{font-size:var(--text-xs);font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--color-text-muted);margin-bottom:var(--space-4)}
+.budget-bar-wrap{background:var(--color-surface-dynamic);border-radius:var(--radius-full);
+  height:10px;overflow:hidden;display:flex;margin-bottom:var(--space-4)}
+.budget-seg{height:100%;transition:width .5s cubic-bezier(0.16,1,0.3,1)}
+.budget-seg.os{background:#6b7280}
+.budget-seg.model{background:var(--color-primary)}
+.budget-seg.tools{background:var(--color-orange)}
+.budget-seg.free{background:var(--color-success)}
+.budget-legend{display:flex;flex-wrap:wrap;gap:var(--space-4)}
+.legend-item{display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);color:var(--color-text-muted)}
+.legend-dot{width:8px;height:8px;border-radius:var(--radius-full);flex-shrink:0}
+.budget-status{display:flex;align-items:center;gap:var(--space-2);
+  padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);
+  font-size:var(--text-sm);font-weight:500;margin-top:var(--space-4)}
+.budget-status.ok{background:var(--color-success-highlight);color:var(--color-success)}
+.budget-status.warn{background:var(--color-warning-highlight);color:var(--color-warning)}
+.budget-status.danger{background:var(--color-error-highlight);color:var(--color-error)}
+
+/* ─── RECOMMENDATION CARD ────────────────────────────────────────────── */
+.rec-card{border:1.5px solid var(--color-primary);background:var(--color-primary-highlight);
+  border-radius:var(--radius-lg);padding:var(--space-5);margin-top:var(--space-5)}
+.rec-label{font-size:var(--text-xs);font-weight:600;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--color-primary);margin-bottom:var(--space-3)}
+.rec-model{font-size:var(--text-lg);font-weight:600;letter-spacing:-.02em;margin-bottom:var(--space-1)}
+.rec-meta{font-size:var(--text-xs);color:var(--color-text-muted)}
+.rec-chips{display:flex;flex-wrap:wrap;gap:var(--space-2);margin-top:var(--space-3)}
+.rec-chip{font-size:var(--text-xs);padding:2px var(--space-3);
+  border-radius:var(--radius-full);background:var(--color-surface);
+  border:1px solid var(--color-border);color:var(--color-text-muted)}
+
+/* ─── OPTION CARDS (use case) ───────────────────────────────────────── */
+.option-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--space-3)}
+.option-card{background:var(--color-surface-2);border:1.5px solid var(--color-border);
+  border-radius:var(--radius-lg);padding:var(--space-4);cursor:pointer;
+  transition:all var(--transition);user-select:none}
+.option-card:hover{border-color:var(--color-primary);background:var(--color-surface-dynamic)}
+.option-card.selected{border-color:var(--color-primary);background:var(--color-primary-highlight)}
+.option-emoji{font-size:1.5rem;margin-bottom:var(--space-2)}
+.option-name{font-size:var(--text-sm);font-weight:600;margin-bottom:var(--space-1)}
+.option-desc{font-size:var(--text-xs);color:var(--color-text-muted);line-height:1.5}
+
+/* ─── OUTPUT AREA ────────────────────────────────────────────────────── */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--color-border);margin-bottom:var(--space-6);overflow-x:auto}
+.tab-btn{padding:var(--space-3) var(--space-5);font-size:var(--text-sm);font-weight:500;
+  color:var(--color-text-muted);border-bottom:2px solid transparent;
+  margin-bottom:-1px;white-space:nowrap;transition:all var(--transition)}
+.tab-btn:hover{color:var(--color-text)}
+.tab-btn.active{color:var(--color-primary);border-bottom-color:var(--color-primary)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+.code-block{position:relative;background:var(--color-surface-offset);
+  border:1px solid var(--color-border);border-radius:var(--radius-lg);overflow:hidden}
+.code-header{display:flex;align-items:center;justify-content:space-between;
+  padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-border)}
+.code-lang{font-size:var(--text-xs);font-weight:600;color:var(--color-text-muted);
+  font-family:var(--font-mono);letter-spacing:.05em}
+.copy-btn{display:flex;align-items:center;gap:var(--space-2);
+  font-size:var(--text-xs);font-weight:500;padding:var(--space-2) var(--space-3);
+  border-radius:var(--radius-md);background:var(--color-surface-dynamic);
+  color:var(--color-text-muted);transition:all var(--transition)}
+.copy-btn:hover{background:var(--color-primary-highlight);color:var(--color-primary)}
+.copy-btn.copied{background:var(--color-success-highlight);color:var(--color-success)}
+.code-content{padding:var(--space-5);overflow-x:auto}
+.code-content pre{font-family:var(--font-mono);font-size:var(--text-xs);
+  line-height:1.7;color:var(--color-text);white-space:pre;tab-size:2}
+
+/* Syntax colors */
+.kw{color:#c792ea}.str{color:#c3e88d}.cm{color:var(--color-text-faint);font-style:italic}
+.fn{color:#82aaff}.num{color:var(--color-orange)}.key{color:#80cbc4}
+
+/* ─── BUTTONS ────────────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);
+  padding:var(--space-3) var(--space-6);border-radius:var(--radius-md);
+  font-size:var(--text-sm);font-weight:600;font-family:var(--font-ui);
+  transition:all var(--transition);white-space:nowrap}
+.btn-primary{background:var(--color-primary);color:#fff}
+.btn-primary:hover{background:var(--color-primary-hover);transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn-ghost{background:transparent;border:1.5px solid var(--color-border);color:var(--color-text-muted)}
+.btn-ghost:hover{border-color:var(--color-primary);color:var(--color-text);background:var(--color-surface-dynamic)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-group{display:flex;gap:var(--space-3);margin-top:var(--space-8);flex-wrap:wrap}
+
+/* ─── SECTION PANELS (step views) ───────────────────────────────────── */
+.step-panel{display:none;animation:fadeSlide .35s cubic-bezier(0.16,1,0.3,1)}
+.step-panel.active{display:block}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── GRID LAYOUT for step 2 ─────────────────────────────────────────── */
+.two-col{display:grid;grid-template-columns:1fr 360px;gap:var(--space-6);align-items:start}
+@media(max-width:768px){.two-col{grid-template-columns:1fr}}
+
+.sticky-panel{position:sticky;top:80px}
+
+/* ─── TEMPLATE CARDS ─────────────────────────────────────────────────── */
+.template-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:var(--space-3);margin-bottom:var(--space-6)}
+.template-card{border:1.5px solid var(--color-border);background:var(--color-surface-2);
+  border-radius:var(--radius-lg);padding:var(--space-4);cursor:pointer;
+  transition:all var(--transition)}
+.template-card:hover{border-color:var(--color-primary);background:var(--color-surface-dynamic)}
+.template-card.selected{border-color:var(--color-primary);background:var(--color-primary-highlight);
+  box-shadow:0 0 0 3px var(--color-primary-highlight)}
+.template-title{font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-1)}
+.template-desc{font-size:var(--text-xs);color:var(--color-text-muted);line-height:1.45}
+.loop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:var(--space-3)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);
+  padding:var(--space-4);border:1.5px solid var(--color-border);
+  border-radius:var(--radius-lg);background:var(--color-surface-2)}
+.toggle-copy{min-width:0}.toggle-title{font-size:var(--text-sm);font-weight:700}
+.toggle-desc{font-size:var(--text-xs);color:var(--color-text-muted)}
+.switch{position:relative;width:44px;height:24px;flex-shrink:0}
+.switch input{opacity:0;width:0;height:0}
+.switch span{position:absolute;inset:0;background:var(--color-border);
+  border-radius:var(--radius-full);transition:all var(--transition)}
+.switch span::before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;
+  border-radius:var(--radius-full);background:#fff;transition:all var(--transition)}
+.switch input:checked + span{background:var(--color-primary)}
+.switch input:checked + span::before{transform:translateX(20px)}
+.score-list{display:flex;flex-direction:column;gap:var(--space-3)}
+.score-row{display:grid;grid-template-columns:64px 1fr 36px;gap:var(--space-2);
+  align-items:center;font-size:var(--text-xs);color:var(--color-text-muted)}
+.score-track{height:6px;border-radius:var(--radius-full);background:var(--color-surface-dynamic);
+  overflow:hidden}
+.score-fill{height:100%;border-radius:var(--radius-full);background:var(--color-primary);
+  transition:width .35s cubic-bezier(0.16,1,0.3,1)}
+.score-fill.warn{background:var(--color-warning)}
+.score-fill.danger{background:var(--color-error)}
+.score-note{margin-top:var(--space-3);font-size:var(--text-xs);color:var(--color-text-muted);
+  line-height:1.5}
+
+/* ─── INSTALL COMMANDS ───────────────────────────────────────────────── */
+.install-tabs{display:flex;gap:var(--space-2);margin-bottom:var(--space-4)}
+.install-tab{font-size:var(--text-xs);padding:var(--space-2) var(--space-4);
+  border-radius:var(--radius-full);border:1px solid var(--color-border);
+  color:var(--color-text-muted);font-weight:500}
+.install-tab.active{background:var(--color-surface-dynamic);border-color:var(--color-primary);
+  color:var(--color-primary)}
+.install-tab:hover{border-color:var(--color-primary)}
+
+/* ─── FOOTER ─────────────────────────────────────────────────────────── */
+.footer{padding:var(--space-6);text-align:center;border-top:1px solid var(--color-border)}
+.footer p{font-size:var(--text-xs);color:var(--color-text-faint)}
+
+/* ─── UTILS ──────────────────────────────────────────────────────────── */
+.text-muted{color:var(--color-text-muted)}
+.text-primary{color:var(--color-primary)}
+.badge{display:inline-flex;align-items:center;padding:2px var(--space-3);
+  border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:600}
+.badge-success{background:var(--color-success-highlight);color:var(--color-success)}
+.badge-warn{background:var(--color-warning-highlight);color:var(--color-warning)}
+.badge-primary{background:var(--color-primary-highlight);color:var(--color-primary)}
+.divider{height:1px;background:var(--color-divider);margin:var(--space-6) 0}
+
+/* OS warning callout */
+.callout{display:flex;align-items:flex-start;gap:var(--space-3);
+  padding:var(--space-4);border-radius:var(--radius-lg);
+  font-size:var(--text-sm);line-height:1.5;margin-top:var(--space-4)}
+.callout.ok{background:var(--color-success-highlight);color:var(--color-success)}
+.callout.warn{background:var(--color-warning-highlight);color:var(--color-warning)}
+.callout.info{background:var(--color-primary-highlight);color:var(--color-primary)}
+.callout-icon{font-size:1rem;flex-shrink:0;margin-top:1px}
+.usage-details{margin-top:var(--space-4);border:1px solid var(--color-border);
+  border-radius:var(--radius-lg);background:var(--color-surface-2);overflow:hidden}
+.usage-details summary{cursor:pointer;padding:var(--space-3) var(--space-4);
+  font-size:var(--text-sm);font-weight:600;color:var(--color-text-muted)}
+.usage-details div{padding:0 var(--space-4) var(--space-4);
+  font-size:var(--text-sm);color:var(--color-text-muted)}
+
+@media(max-width:600px){
+  .main{padding:var(--space-6) var(--space-4)}
+  .hero-title{font-size:var(--text-xl)}
+  .stepper{gap:0}
+  .step-label{display:none}
+  .step-connector{width:24px}
+  .option-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <svg class="logo-mark" viewBox="0 0 28 28" fill="none" aria-label="Local Agent Wizard logo">
+      <rect width="28" height="28" rx="7" fill="var(--color-primary)"/>
+      <path d="M7 14h4l2-5 3 10 2-5h3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="21" cy="8" r="2" fill="#fff" opacity=".7"/>
+    </svg>
+    <span class="brand-name">Local Agent Wizard</span>
+    <span class="brand-badge">MVP</span>
+  </div>
+  <div class="topbar-actions">
+    <a class="topbar-link" href="index.html">首页</a>
+    <a class="topbar-link" href="guides/index.html">教程</a>
+    <a class="topbar-link" href="diagnose.html">报错诊断</a>
+    <button class="theme-toggle" data-theme-toggle aria-label="切换主题">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <p class="hero-eyebrow">本地 AI Agent 配置向导</p>
+    <h1 class="hero-title">输入配置，<span>直接开干</span></h1>
+    <p class="hero-desc">填写你的电脑配置和用途，自动生成可粘贴进 Cursor / Codex / Ollama 的完整 Agent 配置包——不需要懂技术。</p>
+  </div>
+
+  <!-- STEPPER -->
+  <div class="stepper" role="navigation" aria-label="步骤进度">
+    <div class="step-item active" id="step-nav-1">
+      <div class="step-circle">1</div>
+      <span class="step-label">硬件配置</span>
+    </div>
+    <div class="step-connector" id="conn-1"></div>
+    <div class="step-item" id="step-nav-2">
+      <div class="step-circle">2</div>
+      <span class="step-label">使用需求</span>
+    </div>
+    <div class="step-connector" id="conn-2"></div>
+    <div class="step-item" id="step-nav-3">
+      <div class="step-circle">3</div>
+      <span class="step-label">获取配置</span>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 1 ═══════════════════════════════════════════════════════ -->
+  <div class="step-panel active" id="panel-1">
+    <div class="card">
+      <h2 class="card-title">你的电脑配置</h2>
+      <p class="card-desc">根据你的硬件，我们会计算可用内存预算并推荐最合适的模型。</p>
+
+      <div class="field">
+        <label>设备类型</label>
+        <div class="chip-group" id="device-chips">
+          <button class="chip selected" data-val="mac-silicon"><span class="chip-icon">🍎</span>Mac (Apple Silicon)</button>
+          <button class="chip" data-val="win-nvidia"><span class="chip-icon">💚</span>Windows + NVIDIA</button>
+          <button class="chip" data-val="win-amd"><span class="chip-icon">🔴</span>Windows + AMD</button>
+          <button class="chip" data-val="linux"><span class="chip-icon">🐧</span>Linux</button>
+        </div>
+      </div>
+
+      <div class="field" id="chip-field">
+        <label>芯片型号 <span>(Apple Silicon)</span></label>
+        <div class="select-wrapper">
+          <select id="chip-select">
+            <option value="m5-base">Apple M5 (基础款)</option>
+            <option value="m5-pro">Apple M5 Pro</option>
+            <option value="m5-max">Apple M5 Max</option>
+            <option value="m4-base">Apple M4 (基础款)</option>
+            <option value="m4-pro">Apple M4 Pro</option>
+            <option value="m4-max">Apple M4 Max</option>
+            <option value="m3-base">Apple M3</option>
+            <option value="m3-pro">Apple M3 Pro</option>
+            <option value="m2-base">Apple M2</option>
+            <option value="m1-base">Apple M1</option>
+          </select>
+          <span class="select-arrow">▾</span>
+        </div>
+      </div>
+
+      <div class="field" id="gpu-field" style="display:none">
+        <label>GPU 型号</label>
+        <div class="select-wrapper">
+          <select id="gpu-select">
+            <option value="rtx5090">RTX 5090 (32GB VRAM)</option>
+            <option value="rtx5080">RTX 5080 (16GB VRAM)</option>
+            <option value="rtx4090">RTX 4090 (24GB VRAM)</option>
+            <option value="rtx4080">RTX 4080 (16GB VRAM)</option>
+            <option value="rtx4070ti">RTX 4070 Ti (12GB VRAM)</option>
+            <option value="rtx4070">RTX 4070 (12GB VRAM)</option>
+            <option value="rtx4060ti">RTX 4060 Ti (8GB VRAM)</option>
+            <option value="rtx3090">RTX 3090 (24GB VRAM)</option>
+            <option value="rx7900xtx">RX 7900 XTX (24GB VRAM)</option>
+            <option value="rx7800xt">RX 7800 XT (16GB VRAM)</option>
+          </select>
+          <span class="select-arrow">▾</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="os-version">操作系统版本 <span>(选填)</span></label>
+        <input class="text-input" id="os-version" type="text" placeholder="例如 macOS 15 / Windows 11 / Ubuntu 22.04">
+        <div class="field-hint">用于生成更贴近你系统的安装命令；不填写也可以继续。</div>
+      </div>
+
+      <div class="field">
+        <label><span id="mem-field-label">统一内存 / VRAM</span> <span id="mem-val-label">— 16 GB</span></label>
+        <div class="slider-wrap">
+          <input type="range" class="mem-slider" id="mem-slider"
+            min="0" max="7" value="2" aria-label="内存大小">
+        </div>
+        <div class="slider-labels">
+          <span>8 GB</span><span>16 GB</span><span>24 GB</span><span>32 GB</span>
+          <span>48 GB</span><span>64 GB</span><span>96 GB</span><span>128 GB</span>
+        </div>
+      </div>
+
+      <!-- Memory Budget Panel -->
+      <div class="budget-panel" id="budget-panel">
+        <div class="budget-title">内存预算预览</div>
+        <div class="budget-bar-wrap">
+          <div class="budget-seg os" id="bar-os" style="width:31%"></div>
+          <div class="budget-seg model" id="bar-model" style="width:37%"></div>
+          <div class="budget-seg tools" id="bar-tools" style="width:5%"></div>
+          <div class="budget-seg free" id="bar-free" style="width:27%"></div>
+        </div>
+        <div class="budget-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#6b7280"></div><span id="leg-os">系统占用 ~5 GB</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--color-primary)"></div><span id="leg-model">推荐模型 ~6 GB</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--color-orange)"></div><span id="leg-tools">工具链 ~0.8 GB</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--color-success)"></div><span id="leg-free">剩余可用 ~4 GB</span></div>
+        </div>
+        <div class="budget-status ok" id="budget-status">
+          <span>✓</span><span id="budget-msg">内存充足，可稳定运行推荐模型</span>
+        </div>
+      </div>
+
+      <!-- Recommendation inline -->
+      <div class="rec-card" id="rec-card">
+        <div class="rec-label">🎯 推荐方案</div>
+        <div class="rec-model" id="rec-model-name">Qwen3 8B</div>
+        <div class="rec-meta" id="rec-meta">量化: Q4_K_M · 预估速度: 15–20 tok/s · 框架: MLX (Apple Silicon 优化)</div>
+        <div class="rec-chips" id="rec-chips">
+          <span class="rec-chip">适合代码辅助</span>
+          <span class="rec-chip">适合工具调用</span>
+          <span class="rec-chip">支持 MCP</span>
+        </div>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-primary" id="step1-next" onclick="goStep(2)">
+          下一步：配置用途 →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 2 ═══════════════════════════════════════════════════════ -->
+  <div class="step-panel" id="panel-2">
+    <div class="two-col">
+      <div class="card">
+        <h2 class="card-title">你想用来做什么？</h2>
+        <p class="card-desc">选择主要用途（最多 3 项），我们会配置对应的 MCP 工具链。</p>
+
+        <div class="field">
+          <label>一键用途模板 <span>(可选)</span></label>
+          <div class="template-grid" id="template-grid">
+            <button class="template-card" data-template="file-organizer">
+              <div class="template-title">📁 文件整理助手</div>
+              <div class="template-desc">整理下载、文档、图片，适合低风险本地任务。</div>
+            </button>
+            <button class="template-card" data-template="web-monitor">
+              <div class="template-title">🌐 网页监控助手</div>
+              <div class="template-desc">抓取页面、监控变化、整理网页信息。</div>
+            </button>
+            <button class="template-card" data-template="code-reviewer">
+              <div class="template-title">💻 代码审查助手</div>
+              <div class="template-desc">读写项目文件、解释报错、辅助审查代码。</div>
+            </button>
+            <button class="template-card" data-template="private-rag">
+              <div class="template-title">💬 私人知识库</div>
+              <div class="template-desc">读取本地资料并做问答，偏重隐私和检索。</div>
+            </button>
+            <button class="template-card" data-template="workflow-agent">
+              <div class="template-title">🔀 自动化工作流</div>
+              <div class="template-desc">多步任务编排，适合有明确流程的重复任务。</div>
+            </button>
+          </div>
+          <div class="field-hint" id="template-hint">选择模板后仍可手动调整用途、目标工具和自主度。</div>
+        </div>
+
+        <div class="field">
+          <label>主要用途</label>
+          <div class="option-grid" id="usecase-grid">
+            <div class="option-card" data-val="files">
+              <div class="option-emoji">📄</div>
+              <div class="option-name">本地文件处理</div>
+              <div class="option-desc">读写整理批量操作文档</div>
+            </div>
+            <div class="option-card" data-val="web">
+              <div class="option-emoji">🌐</div>
+              <div class="option-name">网页自动化</div>
+              <div class="option-desc">抓取填表监控网页</div>
+            </div>
+            <div class="option-card" data-val="rag">
+              <div class="option-emoji">💬</div>
+              <div class="option-name">知识库问答</div>
+              <div class="option-desc">本地 RAG 私有文档</div>
+            </div>
+            <div class="option-card" data-val="code">
+              <div class="option-emoji">💻</div>
+              <div class="option-name">代码辅助</div>
+              <div class="option-desc">生成审查调试代码</div>
+            </div>
+            <div class="option-card" data-val="auto">
+              <div class="option-emoji">🔀</div>
+              <div class="option-name">多步任务自动化</div>
+              <div class="option-desc">工作流编排 Agent 链</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:var(--space-6)">
+          <label>目标工具</label>
+          <div class="select-wrapper">
+            <select id="target-tool">
+              <option value="qwen-agent">Qwen-Agent (推荐)</option>
+              <option value="cursor">Cursor IDE (MCP 配置)</option>
+              <option value="codex">OpenAI Codex</option>
+              <option value="n8n">n8n 工作流</option>
+              <option value="raw">仅生成配置文件</option>
+            </select>
+            <span class="select-arrow">▾</span>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:var(--space-6)">
+          <label>AI 自主度 <span id="auto-label-val">— 每步询问我（安全）</span></label>
+          <div class="slider-wrap">
+            <input type="range" class="mem-slider" id="auto-slider" min="1" max="5" value="2">
+          </div>
+          <div class="auto-labels">
+            <span>每步<br>确认</span>
+            <span></span>
+            <span>关键步<br>确认</span>
+            <span></span>
+            <span>全自动<br>执行</span>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:var(--space-6)">
+          <label>Loop Engineering <span>(迭代执行策略)</span></label>
+          <div class="toggle-row">
+            <div class="toggle-copy">
+              <div class="toggle-title">启用计划 → 执行 → 验证 → 修正循环</div>
+              <div class="toggle-desc">适合代码、网页自动化、文件整理等需要反复检查结果的任务。</div>
+            </div>
+            <label class="switch" aria-label="启用 Loop Engineering">
+              <input type="checkbox" id="loop-enabled" checked>
+              <span></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="loop-grid" id="loop-settings">
+          <div class="field">
+            <label for="loop-budget">最大循环轮数</label>
+            <div class="select-wrapper">
+              <select id="loop-budget">
+                <option value="2">2 轮（快速）</option>
+                <option value="3" selected>3 轮（推荐）</option>
+                <option value="5">5 轮（复杂任务）</option>
+              </select>
+              <span class="select-arrow">▾</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="verify-level">验证强度</label>
+            <div class="select-wrapper">
+              <select id="verify-level">
+                <option value="light">轻量：检查输出是否存在</option>
+                <option value="standard" selected>标准：检查关键结果</option>
+                <option value="strict">严格：测试/截图/日志三选一</option>
+              </select>
+              <span class="select-arrow">▾</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="stop-rule">停止条件</label>
+            <div class="select-wrapper">
+              <select id="stop-rule">
+                <option value="success" selected>达到目标即停止</option>
+                <option value="approval">每轮后等待确认</option>
+                <option value="budget">用完轮数后总结</option>
+              </select>
+              <span class="select-arrow">▾</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-ghost" onclick="goStep(1)">← 返回</button>
+          <button class="btn btn-primary" onclick="goStep(3)">生成配置包 →</button>
+        </div>
+      </div>
+
+      <!-- sticky side panel -->
+      <div class="sticky-panel">
+        <div class="card" style="padding:var(--space-5)">
+          <div class="rec-label" style="margin-bottom:var(--space-4)">📦 配置预览</div>
+
+          <div style="margin-bottom:var(--space-4)">
+            <div style="font-size:var(--text-xs);color:var(--color-text-faint);margin-bottom:var(--space-1)">推理模型</div>
+            <div style="font-size:var(--text-sm);font-weight:600" id="side-model">Qwen3 8B · Q4_K_M</div>
+          </div>
+
+          <div style="margin-bottom:var(--space-4)">
+            <div style="font-size:var(--text-xs);color:var(--color-text-faint);margin-bottom:var(--space-2)">MCP 工具链</div>
+            <div id="side-tools" style="display:flex;flex-direction:column;gap:var(--space-2)">
+              <div class="badge badge-primary" style="justify-content:flex-start;gap:var(--space-2)">
+                <span>📁</span> filesystem
+              </div>
+              <div class="badge badge-primary" style="justify-content:flex-start;gap:var(--space-2)">
+                <span>🧠</span> memory
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:var(--text-xs);color:var(--color-text-faint);margin-bottom:var(--space-2)">内存预算</div>
+            <div class="budget-bar-wrap" style="height:6px;margin-bottom:var(--space-2)">
+              <div class="budget-seg os" id="side-bar-os" style="width:31%"></div>
+              <div class="budget-seg model" id="side-bar-model" style="width:37%"></div>
+              <div class="budget-seg tools" id="side-bar-tools" style="width:5%"></div>
+              <div class="budget-seg free" id="side-bar-free" style="width:27%"></div>
+            </div>
+            <div style="font-size:var(--text-xs);color:var(--color-text-muted)" id="side-budget-text">
+              剩余 ~4.2 GB 可用
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div>
+            <div style="font-size:var(--text-xs);color:var(--color-text-faint);margin-bottom:var(--space-3)">配置评分</div>
+            <div class="score-list" id="score-list"></div>
+            <div class="score-note" id="score-note">评分会随模型、工具链、自主度和 Loop 策略变化。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STEP 3 ═══════════════════════════════════════════════════════ -->
+  <div class="step-panel" id="panel-3">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:var(--space-4);margin-bottom:var(--space-6)">
+        <div>
+          <h2 class="card-title" style="margin-bottom:var(--space-1)">🎉 你的 Agent 配置包</h2>
+          <p style="font-size:var(--text-sm);color:var(--color-text-muted)">复制下方内容，粘贴进对应工具即可开始。</p>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:var(--space-2);flex-wrap:wrap;justify-content:flex-end">
+          <button class="btn btn-ghost" style="white-space:nowrap" onclick="copyShareLink(this)">
+            🔗 复制分享链接
+          </button>
+          <button class="btn btn-ghost" style="white-space:nowrap" onclick="downloadAll()">
+            ⬇ 打包下载
+          </button>
+        </div>
+      </div>
+
+      <div class="callout info" id="output-summary">
+        <span class="callout-icon">ℹ️</span>
+        <span id="output-summary-text">硬件: M5 · 16GB · 推荐模型: Qwen3 8B Q4_K_M · 工具链: filesystem + memory</span>
+      </div>
+
+      <!-- TABS -->
+      <div class="tabs" style="margin-top:var(--space-6)">
+        <button class="tab-btn active" onclick="switchTab('agent', this)">agent.py</button>
+        <button class="tab-btn" onclick="switchTab('mcp', this)">MCP 配置</button>
+        <button class="tab-btn" onclick="switchTab('prompt', this)">System Prompt</button>
+        <button class="tab-btn" onclick="switchTab('loop', this)">Loop Playbook</button>
+        <button class="tab-btn" onclick="switchTab('plans', this)">方案对比</button>
+        <button class="tab-btn" onclick="switchTab('install', this)">安装命令</button>
+        <button class="tab-btn" onclick="switchTab('health', this)">健康检查</button>
+        <button class="tab-btn" onclick="switchTab('errors', this)">错误排查</button>
+      </div>
+
+      <!-- TAB: agent.py -->
+      <div class="tab-panel active" id="tab-agent">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">PYTHON — agent.py</span>
+            <button class="copy-btn" onclick="copyCode('code-agent',this)">
+              <span>复制</span>
+            </button>
+          </div>
+          <div class="code-content">
+            <pre id="code-agent"></pre>
+          </div>
+        </div>
+        <div class="callout info" style="margin-top:var(--space-4)">
+          <span class="callout-icon">💡</span>
+          <span>将此文件保存为 <code>agent.py</code>，运行 <code>python agent.py</code> 即可启动。<br>
+          确保 Ollama 已启动并加载了对应模型。</span>
+        </div>
+        <details class="usage-details">
+          <summary>使用说明</summary>
+          <div>先运行安装命令并拉取模型，再把此文件放到你的工作目录。首次运行建议用简单任务测试工具链是否能正常连接。</div>
+        </details>
+      </div>
+
+      <!-- TAB: MCP -->
+      <div class="tab-panel" id="tab-mcp">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">JSON — Cursor / Claude Desktop settings</span>
+            <button class="copy-btn" onclick="copyCode('code-mcp',this)">
+              <span>复制</span>
+            </button>
+          </div>
+          <div class="code-content">
+            <pre id="code-mcp"></pre>
+          </div>
+        </div>
+        <div class="callout info" style="margin-top:var(--space-4)">
+          <span class="callout-icon">📍</span>
+          <span>Cursor: 打开 Settings → MCP，粘贴此 JSON。<br>
+          Claude Desktop: 粘贴进 <code>~/.claude/settings.json</code> 的 <code>mcpServers</code> 字段。</span>
+        </div>
+        <details class="usage-details">
+          <summary>使用说明</summary>
+          <div>建议先只启用 filesystem 和 fetch 等低风险工具，确认路径和权限正确后再添加 playwright、embedding 等资源消耗更高的工具。</div>
+        </details>
+      </div>
+
+      <!-- TAB: Prompt -->
+      <div class="tab-panel" id="tab-prompt">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">PROMPT — System Prompt</span>
+            <button class="copy-btn" onclick="copyCode('code-prompt',this)">
+              <span>复制</span>
+            </button>
+          </div>
+          <div class="code-content">
+            <pre id="code-prompt"></pre>
+          </div>
+        </div>
+        <div class="callout info" style="margin-top:var(--space-4)">
+          <span class="callout-icon">✏️</span>
+          <span>将 <code>[YOUR_WORKSPACE_PATH]</code> 替换为你的工作目录路径（例如 <code>/Users/你的用户名/workspace</code>）。</span>
+        </div>
+        <details class="usage-details">
+          <summary>使用说明</summary>
+          <div>如果你选择了较高自主度，仍建议保留删除、覆盖、联网提交等动作的确认规则，避免本地 Agent 误操作。</div>
+        </details>
+      </div>
+
+      <!-- TAB: Loop Playbook -->
+      <div class="tab-panel" id="tab-loop">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">PLAYBOOK — Loop Engineering</span>
+            <button class="copy-btn" onclick="copyCode('code-loop',this)">
+              <span>复制</span>
+            </button>
+          </div>
+          <div class="code-content">
+            <pre id="code-loop"></pre>
+          </div>
+        </div>
+        <details class="usage-details">
+          <summary>使用说明</summary>
+          <div>把这份 Playbook 贴到 Agent 的系统提示词或任务开头，可让 Agent 按固定循环推进、验证并收敛结果。</div>
+        </details>
+      </div>
+
+      <!-- TAB: Plan Compare -->
+      <div class="tab-panel" id="tab-plans">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">REPORT — 智能方案对比</span>
+            <button class="copy-btn" onclick="copyCode('code-plans',this)">
+              <span>复制</span>
+            </button>
+          </div>
+          <div class="code-content">
+            <pre id="code-plans"></pre>
+          </div>
+        </div>
+        <details class="usage-details">
+          <summary>使用说明</summary>
+          <div>如果推荐方案运行不稳定，优先采用保守降级方案；如果你追求质量且内存充足，再尝试性能优先方案。</div>
+        </details>
+      </div>
+
+      <!-- TAB: Install -->
+      <div class="tab-panel" id="tab-install">
+        <div class="install-tabs">
+          <button class="install-tab active" onclick="switchInstallOS('mac',this)">macOS</button>
+          <button class="install-tab" onclick="switchInstallOS('win',this)">Windows</button>
+          <button class="install-tab" onclick="switchInstallOS('linux',this)">Linux</button>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang" id="install-os-label">BASH — macOS</span>
+            <button class="copy-btn" onclick="copyCode('code-install',this)">
+              <span>复制</span>
+            </button>
+          </div>
+          <div class="code-content">
+            <pre id="code-install"></pre>
+          </div>
+        </div>
+        <details class="usage-details">
+          <summary>使用说明</summary>
+          <div>安装命令按常见环境生成，执行前请确认你已经安装对应系统的包管理器，例如 macOS 的 Homebrew。</div>
+        </details>
+      </div>
+
+      <!-- TAB: Health Check -->
+      <div class="tab-panel" id="tab-health">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">CHECKLIST — 本地环境健康检查</span>
+            <button class="copy-btn" onclick="copyCode('code-health',this)">
+              <span>复制</span>
+            </button>
+          </div>
+          <div class="code-content">
+            <pre id="code-health"></pre>
+          </div>
+        </div>
+        <details class="usage-details">
+          <summary>使用说明</summary>
+          <div>先按顺序执行检查命令。如果某一步失败，直接复制失败输出去「错误排查」Tab 对照原因。</div>
+        </details>
+      </div>
+
+      <!-- TAB: Error Guide -->
+      <div class="tab-panel" id="tab-errors">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-lang">GUIDE — 常见错误翻译库</span>
+            <button class="copy-btn" onclick="copyCode('code-errors',this)">
+              <span>复制</span>
+            </button>
+          </div>
+          <div class="code-content">
+            <pre id="code-errors"></pre>
+          </div>
+        </div>
+        <details class="usage-details">
+          <summary>使用说明</summary>
+          <div>这份错误库偏向非技术用户：先看「人话解释」，再执行「怎么修」。后续可以扩展成独立 FAQ 页面。</div>
+        </details>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-ghost" onclick="goStep(2)">← 修改配置</button>
+        <button class="btn btn-primary" onclick="downloadAll()">⬇ 打包下载全部文件</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <p>Local Agent Wizard · 纯客户端运行 · 不收集任何数据 · 基于 Qwen-Agent + MCP 生态</p>
+</footer>
+</div>
+
+<script>
+/* ─── STATE ─────────────────────────────────────────────────────────── */
+const state = {
+  device: 'mac-silicon',
+  chip: 'm5-base',
+  gpu: 'rtx4090',
+  osVersion: '',
+  memIdx: 2, // index into MEM_SIZES
+  template: '',
+  usecases: [],
+  targetTool: 'qwen-agent',
+  autonomy: 2,
+  loopEnabled: true,
+  loopBudget: 3,
+  verifyLevel: 'standard',
+  stopRule: 'success',
+  installOS: 'mac',
+  currentStep: 1,
+};
+
+const MEM_SIZES = [8,16,24,32,48,64,96,128];
+const OS_OVERHEAD = { 'mac-silicon':5, 'win-nvidia':4, 'win-amd':4, 'linux':3 };
+
+const GPU_VRAM = {
+  'rtx5090':32,'rtx5080':16,'rtx4090':24,'rtx4080':16,
+  'rtx4070ti':12,'rtx4070':12,'rtx4060ti':8,'rtx3090':24,
+  'rx7900xtx':24,'rx7800xt':16
+};
+
+/* ─── MODEL TABLE ────────────────────────────────────────────────────── */
+const MODEL_RULES = [
+  {max:5,  name:'Qwen3 1.7B / Phi-4-mini', quant:'Q4',     speed:'20-30', memGB:2.5, fw:'Ollama / llama.cpp', use:['轻量对话','基础工具调用','低内存优先'], ollama:'qwen3:1.7b'},
+  {max:8,  name:'Qwen3 8B',                 quant:'Q4_K_M', speed:'15-20', memGB:5.5, fw:'Ollama / MLX',       use:['代码辅助','工具调用','支持 MCP'], ollama:'qwen3:8b'},
+  {max:12, name:'Qwen2.5-Coder 14B',        quant:'Q4_K_M', speed:'10-15', memGB:9.5, fw:'Ollama / MLX',       use:['代码生成','RAG','调试审查'], ollama:'qwen2.5-coder:14b'},
+  {max:20, name:'Qwen3 14B / Mistral 22B',  quant:'Q4',     speed:'8-12',  memGB:11.5, fw:'Ollama / MLX',      use:['复杂推理','多步 Agent','长文处理'], ollama:'qwen3:14b'},
+  {max:Infinity, name:'Qwen3 30B-A3B (MoE)', quant:'Q4',    speed:'12-18', memGB:16,   fw:'Ollama / MLX',      use:['高质量推理','长上下文','多工具调用'], ollama:'qwen3:30b-a3b'},
+];
+
+function getModelRec(modelBudgetGB, safetyMaxGB = Infinity) {
+  const byBudget = MODEL_RULES.find(r => modelBudgetGB < r.max) || MODEL_RULES[MODEL_RULES.length - 1];
+  let idx = MODEL_RULES.indexOf(byBudget);
+  while (idx > 0 && MODEL_RULES[idx].memGB > safetyMaxGB) idx -= 1;
+  return MODEL_RULES[idx];
+}
+
+/* ─── MCP TOOLS TABLE ────────────────────────────────────────────────── */
+const TOOL_MAP = {
+  files:  [{key:'filesystem',label:'📁 filesystem',mem:.4},{key:'sqlite',label:'🗃 sqlite',mem:.1}],
+  web:    [{key:'playwright',label:'🎭 playwright',mem:.8},{key:'fetch',label:'🌐 fetch',mem:.1}],
+  rag:    [{key:'filesystem',label:'📁 filesystem',mem:.4},{key:'embedding',label:'🧮 embedding 0.6B',mem:.8}],
+  code:   [{key:'code_interpreter',label:'🐍 code_interpreter',mem:.3},{key:'filesystem',label:'📁 filesystem',mem:.4}],
+  auto:   [{key:'memory',label:'🧠 memory',mem:.2},{key:'filesystem',label:'📁 filesystem',mem:.4},{key:'fetch',label:'🌐 fetch',mem:.1}],
+};
+
+const TOOL_BUDGET = {
+  files:.5, web:.9, rag:1.2, code:.7, auto:.7
+};
+
+const TEMPLATE_PRESETS = {
+  'file-organizer': {
+    name: '文件整理助手',
+    usecases: ['files'],
+    targetTool: 'qwen-agent',
+    autonomy: 2,
+    loopBudget: 2,
+    verifyLevel: 'standard',
+    stopRule: 'approval',
+    hint: '适合先从低风险任务开始：整理文件、批量改名、生成目录索引。'
+  },
+  'web-monitor': {
+    name: '网页监控助手',
+    usecases: ['web', 'auto'],
+    targetTool: 'qwen-agent',
+    autonomy: 3,
+    loopBudget: 3,
+    verifyLevel: 'strict',
+    stopRule: 'success',
+    hint: '会启用 playwright/fetch，首次运行需要安装浏览器依赖。'
+  },
+  'code-reviewer': {
+    name: '代码审查助手',
+    usecases: ['code', 'files'],
+    targetTool: 'cursor',
+    autonomy: 2,
+    loopBudget: 3,
+    verifyLevel: 'strict',
+    stopRule: 'approval',
+    hint: '适合 Cursor MCP 或 Qwen-Agent，默认保守确认写入操作。'
+  },
+  'private-rag': {
+    name: '私人知识库',
+    usecases: ['rag', 'files'],
+    targetTool: 'qwen-agent',
+    autonomy: 2,
+    loopBudget: 3,
+    verifyLevel: 'standard',
+    stopRule: 'success',
+    hint: '会启用 embedding，内存偏低时建议减少同时运行的应用。'
+  },
+  'workflow-agent': {
+    name: '自动化工作流',
+    usecases: ['auto', 'files', 'web'],
+    targetTool: 'n8n',
+    autonomy: 3,
+    loopBudget: 5,
+    verifyLevel: 'strict',
+    stopRule: 'budget',
+    hint: '适合明确步骤的重复工作，建议先小范围试跑。'
+  },
+};
+
+/* ─── COMPUTE BUDGET ─────────────────────────────────────────────────── */
+function computeBudget() {
+  const totalGB = MEM_SIZES[state.memIdx];
+  const osGB = OS_OVERHEAD[state.device] || 5;
+  const availGB = totalGB - osGB;
+  const modelBudgetGB = Math.max(availGB * 0.7, 0);
+  const tools = getSelectedTools();
+  const toolsGB = tools.length
+    ? tools.reduce((sum, tool) => sum + tool.mem, 0)
+    : 0.5;
+  const safetyMaxModelGB = Math.max(totalGB * 0.9 - osGB - toolsGB, 0);
+  const rec = getModelRec(modelBudgetGB, safetyMaxModelGB);
+  const modelGB = rec.memGB;
+  const usedGB = osGB + modelGB + toolsGB;
+  const freeGB = Math.max(totalGB - usedGB, 0);
+  const ratio = usedGB / totalGB;
+  return {totalGB, osGB, modelGB, toolsGB, freeGB, availGB, modelBudgetGB, ratio, rec};
+}
+
+function clampScore(value) {
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function computeScores() {
+  const b = computeBudget();
+  const tools = getSelectedTools();
+  const hasHeavyTool = tools.some(t => ['playwright','embedding'].includes(t.key));
+  const hasCode = state.usecases.includes('code');
+  const hasWeb = state.usecases.includes('web');
+  const hasRag = state.usecases.includes('rag');
+  const stability = clampScore(108 - b.ratio * 55 - (hasHeavyTool ? 8 : 0) + (state.loopEnabled ? 5 : 0));
+  const performance = clampScore(48 + b.modelBudgetGB * 3 + (b.totalGB >= 32 ? 12 : 0) - tools.length * 2);
+  const safety = clampScore(96 - state.autonomy * 9 - (hasWeb ? 7 : 0) + (state.stopRule === 'approval' ? 10 : 0) + (state.verifyLevel === 'strict' ? 6 : 0));
+  const ease = clampScore(88 - tools.length * 6 - (hasRag ? 8 : 0) - (hasWeb ? 6 : 0) + (state.template ? 8 : 0));
+  const capability = clampScore(45 + tools.length * 8 + (hasCode ? 8 : 0) + (hasWeb ? 8 : 0) + (hasRag ? 8 : 0) + (state.loopEnabled ? 8 : 0));
+  return {stability, performance, safety, ease, capability};
+}
+
+function getScoreNote(scores) {
+  const weakest = Object.entries(scores).sort((a,b)=>a[1]-b[1])[0];
+  const notes = {
+    stability: '稳定性最低：建议降级模型、减少工具链或关闭其他应用。',
+    performance: '性能偏弱：适合保守使用，不建议长上下文和多工具并发。',
+    safety: '安全性偏弱：建议降低自主度，或把停止条件改为每轮确认。',
+    ease: '易上手程度偏弱：建议先选择用途模板，减少高级工具。',
+    capability: '能力上限偏弱：可以增加用途工具或启用 Loop Engineering。'
+  };
+  return notes[weakest[0]] || '当前配置整体均衡。';
+}
+
+function renderScores() {
+  const scores = computeScores();
+  const labels = {
+    stability: '稳定性',
+    performance: '性能',
+    safety: '安全性',
+    ease: '易上手',
+    capability: '能力'
+  };
+  const container = document.getElementById('score-list');
+  if(container) {
+    container.innerHTML = Object.entries(scores).map(([key, value])=>{
+      const cls = value < 55 ? 'danger' : value < 72 ? 'warn' : '';
+      return `<div class="score-row"><span>${labels[key]}</span><div class="score-track"><div class="score-fill ${cls}" style="width:${value}%"></div></div><strong>${value}</strong></div>`;
+    }).join('');
+  }
+  const note = document.getElementById('score-note');
+  if(note) note.textContent = getScoreNote(scores);
+}
+
+/* ─── RENDER BUDGET BAR ──────────────────────────────────────────────── */
+function renderBudget() {
+  const b = computeBudget();
+  const t = b.totalGB;
+  const osP  = (b.osGB/t*100).toFixed(1)+'%';
+  const modP = (b.modelGB/t*100).toFixed(1)+'%';
+  const tolP = (b.toolsGB/t*100).toFixed(1)+'%';
+  const freP = (b.freeGB/t*100).toFixed(1)+'%';
+
+  ['bar-os','side-bar-os'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.width=osP});
+  ['bar-model','side-bar-model'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.width=modP});
+  ['bar-tools','side-bar-tools'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.width=tolP});
+  ['bar-free','side-bar-free'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.width=freP});
+
+  document.getElementById('leg-os').textContent = `系统占用 ~${b.osGB} GB`;
+  document.getElementById('leg-model').textContent = `推荐模型 ~${b.modelGB} GB`;
+  document.getElementById('leg-tools').textContent = `工具链 ~${b.toolsGB.toFixed(1)} GB`;
+  document.getElementById('leg-free').textContent = `剩余可用 ~${b.freeGB.toFixed(1)} GB`;
+
+  const sideText = document.getElementById('side-budget-text');
+  if(sideText) sideText.textContent = `剩余 ~${b.freeGB.toFixed(1)} GB 可用`;
+
+  const statusEl = document.getElementById('budget-status');
+  const msgEl = document.getElementById('budget-msg');
+  const nextBtn = document.getElementById('step1-next');
+  if(b.availGB < 5){
+    statusEl.className='budget-status warn';
+    msgEl.textContent='⚠ 当前配置仅能运行轻量对话模型，不建议做复杂 Agent';
+    if(nextBtn) nextBtn.disabled = b.ratio > 1;
+  } else if(b.ratio < 0.9){
+    statusEl.className='budget-status ok';
+    msgEl.textContent='✓ 内存充足，可稳定运行推荐模型';
+    if(nextBtn) nextBtn.disabled = false;
+  } else if(b.ratio <= 1){
+    statusEl.className='budget-status warn';
+    msgEl.textContent='⚠ 内存偏紧，已优先选择更小模型；建议关闭其他应用后运行';
+    if(nextBtn) nextBtn.disabled = false;
+  } else {
+    statusEl.className='budget-status danger';
+    msgEl.textContent='✗ 内存不足，当前组合无法安全推荐，请减少用途或选择更大内存';
+    if(nextBtn) nextBtn.disabled = true;
+  }
+}
+
+/* ─── RENDER RECOMMENDATION ──────────────────────────────────────────── */
+function renderRec() {
+  const b = computeBudget();
+  const rec = b.rec;
+  const mn = document.getElementById('rec-model-name');
+  const mm = document.getElementById('rec-meta');
+  const chips = document.getElementById('rec-chips');
+  if(mn) mn.textContent = rec.name;
+  if(mm) mm.textContent = `量化: ${rec.quant} · 模型预算: ${b.modelBudgetGB.toFixed(1)}GB · 预估速度: ${rec.speed} tok/s · 框架: ${rec.fw}`;
+  if(chips){
+    chips.innerHTML = rec.use.map(u=>`<span class="rec-chip">${u}</span>`).join('');
+  }
+  const sideModel = document.getElementById('side-model');
+  if(sideModel) sideModel.textContent = `${rec.name} · ${rec.quant}`;
+  renderScores();
+}
+
+/* ─── STEP NAVIGATION ────────────────────────────────────────────────── */
+function goStep(n) {
+  state.currentStep = n;
+  document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+n).classList.add('active');
+
+  [1,2,3].forEach(i=>{
+    const nav = document.getElementById('step-nav-'+i);
+    nav.classList.remove('active','done');
+    if(i < n) nav.classList.add('done');
+    else if(i === n) nav.classList.add('active');
+    const conn = document.getElementById('conn-'+i);
+    if(conn) conn.style.background = i < n ? 'var(--color-success)' : 'var(--color-border)';
+  });
+
+  if(n === 3) generateOutputs();
+  if(n === 3) updateShareUrl(false);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ─── DEVICE CHIPS ───────────────────────────────────────────────────── */
+document.getElementById('device-chips').addEventListener('click', e=>{
+  const chip = e.target.closest('.chip');
+  if(!chip) return;
+  document.querySelectorAll('#device-chips .chip').forEach(c=>c.classList.remove('selected'));
+  chip.classList.add('selected');
+  state.device = chip.dataset.val;
+  const isMac = state.device === 'mac-silicon';
+  document.getElementById('chip-field').style.display = isMac ? '' : 'none';
+  document.getElementById('gpu-field').style.display = !isMac ? '' : 'none';
+  document.getElementById('mem-field-label').textContent = isMac || state.device === 'linux'
+    ? '统一内存 / RAM'
+    : '可用 VRAM / RAM';
+  if(!isMac && GPU_VRAM[state.gpu]){
+    const idx = MEM_SIZES.indexOf(GPU_VRAM[state.gpu]);
+    if(idx >= 0){
+      state.memIdx = idx;
+      document.getElementById('mem-slider').value = idx;
+      document.getElementById('mem-val-label').textContent = `— ${MEM_SIZES[state.memIdx]} GB`;
+    }
+  }
+  renderBudget(); renderRec();
+});
+
+/* ─── MEM SLIDER ─────────────────────────────────────────────────────── */
+document.getElementById('mem-slider').addEventListener('input', e=>{
+  state.memIdx = +e.target.value;
+  document.getElementById('mem-val-label').textContent = `— ${MEM_SIZES[state.memIdx]} GB`;
+  renderBudget(); renderRec();
+});
+
+/* ─── CHIP SELECT ────────────────────────────────────────────────────── */
+document.getElementById('chip-select').addEventListener('change',e=>{
+  state.chip = e.target.value; renderBudget(); renderRec();
+});
+document.getElementById('gpu-select').addEventListener('change',e=>{
+  state.gpu = e.target.value;
+  const vram = GPU_VRAM[state.gpu];
+  const idx = MEM_SIZES.indexOf(vram);
+  if(idx >= 0){
+    state.memIdx = idx;
+    document.getElementById('mem-slider').value = idx;
+    document.getElementById('mem-val-label').textContent = `— ${MEM_SIZES[state.memIdx]} GB`;
+  }
+  renderBudget(); renderRec();
+});
+
+document.getElementById('os-version').addEventListener('input', e=>{
+  state.osVersion = e.target.value.trim();
+});
+
+/* ─── TEMPLATE PRESETS ───────────────────────────────────────────────── */
+document.getElementById('template-grid').addEventListener('click', e=>{
+  const card = e.target.closest('.template-card');
+  if(!card) return;
+  applyTemplate(card.dataset.template);
+});
+
+function applyTemplate(key) {
+  const preset = TEMPLATE_PRESETS[key];
+  if(!preset) return;
+  state.template = key;
+  state.usecases = [...preset.usecases];
+  state.targetTool = preset.targetTool;
+  state.autonomy = preset.autonomy;
+  state.loopEnabled = true;
+  state.loopBudget = preset.loopBudget;
+  state.verifyLevel = preset.verifyLevel;
+  state.stopRule = preset.stopRule;
+  document.getElementById('target-tool').value = state.targetTool;
+  document.getElementById('auto-slider').value = state.autonomy;
+  document.getElementById('loop-enabled').checked = state.loopEnabled;
+  document.getElementById('loop-budget').value = String(state.loopBudget);
+  document.getElementById('verify-level').value = state.verifyLevel;
+  document.getElementById('stop-rule').value = state.stopRule;
+  document.getElementById('auto-label-val').textContent = `— ${autoLabels[state.autonomy-1]}`;
+  toggleLoopSettings();
+  document.getElementById('template-hint').textContent = preset.hint;
+  syncTemplateCards();
+  syncUsecaseCards();
+  updateSideTools();
+  renderBudget();
+  renderRec();
+}
+
+function syncTemplateCards() {
+  document.querySelectorAll('#template-grid .template-card').forEach(card=>{
+    card.classList.toggle('selected', card.dataset.template === state.template);
+  });
+}
+
+function syncUsecaseCards() {
+  document.querySelectorAll('#usecase-grid .option-card').forEach(card=>{
+    card.classList.toggle('selected', state.usecases.includes(card.dataset.val));
+  });
+}
+
+function syncFormFromState() {
+  document.querySelectorAll('#device-chips .chip').forEach(chip=>{
+    chip.classList.toggle('selected', chip.dataset.val === state.device);
+  });
+  const isMac = state.device === 'mac-silicon';
+  document.getElementById('chip-field').style.display = isMac ? '' : 'none';
+  document.getElementById('gpu-field').style.display = !isMac ? '' : 'none';
+  document.getElementById('mem-field-label').textContent = isMac || state.device === 'linux'
+    ? '统一内存 / RAM'
+    : '可用 VRAM / RAM';
+  document.getElementById('chip-select').value = state.chip;
+  document.getElementById('gpu-select').value = state.gpu;
+  document.getElementById('os-version').value = state.osVersion;
+  document.getElementById('mem-slider').value = state.memIdx;
+  document.getElementById('mem-val-label').textContent = `— ${MEM_SIZES[state.memIdx]} GB`;
+  document.getElementById('target-tool').value = state.targetTool;
+  document.getElementById('auto-slider').value = state.autonomy;
+  document.getElementById('auto-label-val').textContent = `— ${autoLabels[state.autonomy-1]}`;
+  document.getElementById('loop-enabled').checked = state.loopEnabled;
+  document.getElementById('loop-budget').value = String(state.loopBudget);
+  document.getElementById('verify-level').value = state.verifyLevel;
+  document.getElementById('stop-rule').value = state.stopRule;
+  syncTemplateCards();
+  syncUsecaseCards();
+  updateSideTools();
+  toggleLoopSettings();
+  renderBudget();
+  renderRec();
+}
+
+/* ─── USE CASE CARDS ─────────────────────────────────────────────────── */
+document.getElementById('usecase-grid').addEventListener('click', e=>{
+  const card = e.target.closest('.option-card');
+  if(!card) return;
+  const val = card.dataset.val;
+  if(state.usecases.includes(val)){
+    state.usecases = state.usecases.filter(v=>v!==val);
+    card.classList.remove('selected');
+  } else {
+    if(state.usecases.length >= 3) {
+      const statusEl = document.getElementById('budget-status');
+      const msgEl = document.getElementById('budget-msg');
+      statusEl.className='budget-status warn';
+      msgEl.textContent='⚠ 主要用途最多选择 3 项，避免工具链过重';
+      return;
+    }
+    state.usecases.push(val);
+    card.classList.add('selected');
+  }
+  state.template = '';
+  syncTemplateCards();
+  document.getElementById('template-hint').textContent = '已进入手动调整模式；最多选择 3 项用途。';
+  updateSideTools(); renderBudget(); renderRec();
+});
+
+function updateSideTools(){
+  const container = document.getElementById('side-tools');
+  const colors = ['badge-primary','badge-success'];
+  const tools = getSelectedTools();
+  container.innerHTML = tools.length
+    ? tools.map((t,i)=>`<div class="badge ${colors[i%2]}" style="justify-content:flex-start;gap:var(--space-2)">${t.label}</div>`).join('')
+    : '<span style="font-size:var(--text-xs);color:var(--color-text-faint)">请选择用途</span>';
+}
+
+function getSelectedTools(){
+  const seen = new Set();
+  return state.usecases.flatMap(u=>TOOL_MAP[u]||[]).filter(t=>{
+    if(seen.has(t.key)) return false;
+    seen.add(t.key); return true;
+  });
+}
+
+/* ─── AUTONOMY SLIDER ────────────────────────────────────────────────── */
+const autoLabels = ['每步询问我（安全）','多数步骤询问','关键步骤确认','较少干预','全自动执行（高效）'];
+document.getElementById('auto-slider').addEventListener('input',e=>{
+  state.autonomy = +e.target.value;
+  state.template = '';
+  syncTemplateCards();
+  document.getElementById('template-hint').textContent = '已进入手动调整模式；模板选择不会覆盖你的修改。';
+  document.getElementById('auto-label-val').textContent = `— ${autoLabels[state.autonomy-1]}`;
+  renderScores();
+});
+
+/* ─── TARGET TOOL ────────────────────────────────────────────────────── */
+document.getElementById('target-tool').addEventListener('change',e=>{
+  state.targetTool=e.target.value;
+  state.template = '';
+  syncTemplateCards();
+  document.getElementById('template-hint').textContent = '已进入手动调整模式；模板选择不会覆盖你的修改。';
+  renderScores();
+});
+
+/* ─── LOOP ENGINEERING ───────────────────────────────────────────────── */
+document.getElementById('loop-enabled').addEventListener('change', e=>{
+  state.loopEnabled = e.target.checked;
+  state.template = '';
+  syncTemplateCards();
+  toggleLoopSettings();
+  document.getElementById('template-hint').textContent = state.loopEnabled
+    ? '已启用 Loop Engineering：输出会包含迭代执行协议。'
+    : '已关闭 Loop Engineering：输出会更像一次性配置。';
+  renderScores();
+});
+document.getElementById('loop-budget').addEventListener('change', e=>{
+  state.loopBudget = +e.target.value;
+  markManualLoopEdit();
+});
+document.getElementById('verify-level').addEventListener('change', e=>{
+  state.verifyLevel = e.target.value;
+  markManualLoopEdit();
+});
+document.getElementById('stop-rule').addEventListener('change', e=>{
+  state.stopRule = e.target.value;
+  markManualLoopEdit();
+});
+
+function toggleLoopSettings() {
+  const settings = document.getElementById('loop-settings');
+  settings.style.opacity = state.loopEnabled ? '1' : '.45';
+  settings.querySelectorAll('select').forEach(select=>{ select.disabled = !state.loopEnabled; });
+}
+
+function markManualLoopEdit() {
+  state.template = '';
+  syncTemplateCards();
+  document.getElementById('template-hint').textContent = '已自定义 Loop Engineering 策略。';
+  renderScores();
+}
+
+/* ─── GENERATE OUTPUTS ───────────────────────────────────────────────── */
+function generateOutputs(){
+  const b = computeBudget();
+  const rec = b.rec;
+  const tools = getSelectedTools();
+  const effectiveTools = tools.length ? tools : [
+    {key:'filesystem',label:'📁 filesystem',mem:.4},
+    {key:'memory',label:'🧠 memory',mem:.2},
+  ];
+  const toolsStr = effectiveTools.map(t=>t.label.replace(/^[^\w]+ /,'')).join(' + ');
+  const autoMode = ['每步确认','多数确认','关键确认','较少干预','全自动'][state.autonomy-1];
+  const targetName = {
+    'qwen-agent':'Qwen-Agent',
+    'cursor':'Cursor IDE',
+    'codex':'OpenAI Codex',
+    'n8n':'n8n',
+    'raw':'通用配置'
+  }[state.targetTool];
+  const deviceName = {
+    'mac-silicon':'Apple Silicon Mac',
+    'win-nvidia':'Windows + NVIDIA GPU',
+    'win-amd':'Windows + AMD GPU',
+    'linux':'Linux'
+  }[state.device];
+  const usecaseNames = state.usecases.map(u=>({
+    files:'本地文件处理',web:'网页自动化',rag:'知识库问答',code:'代码辅助',auto:'多步任务自动化'
+  }[u])).join('、') || '通用助手';
+  const loopProtocol = generateLoopPlaybook(usecaseNames, effectiveTools, rec);
+
+  // Summary
+  document.getElementById('output-summary-text').textContent =
+    `设备: ${deviceName}${state.osVersion ? ` · ${state.osVersion}` : ''} · ${MEM_SIZES[state.memIdx]}GB · 推荐模型: ${rec.name} ${rec.quant} · 工具链: ${toolsStr} · 目标: ${targetName} · 自主度: ${autoMode} · Loop: ${state.loopEnabled ? `${state.loopBudget}轮/${state.verifyLevel}` : '关闭'}`;
+
+  // --- agent.py ---
+  const mcpServersCode = generateMCPServersCode(effectiveTools,'    ');
+  const builtinTools = effectiveTools.some(t=>t.key==='code_interpreter') ? "\n    'code_interpreter'," : '';
+  const autoComment = state.autonomy >= 4
+    ? '高自主度模式：Agent 将较少询问确认，直接执行'
+    : state.autonomy <= 2
+    ? '安全模式：重要操作前 Agent 会主动询问确认'
+    : '均衡模式：仅在关键步骤确认';
+
+  const agentCode = `# Generated by Local Agent Wizard
+# Hardware: ${deviceName}, ${MEM_SIZES[state.memIdx]}GB RAM/VRAM${state.osVersion ? `, ${state.osVersion}` : ''}
+# Use cases: ${usecaseNames}
+# ${autoComment}
+
+from qwen_agent.agents import Assistant
+
+llm_cfg = {
+    'model': '${rec.ollama}',
+    'model_server': 'http://localhost:11434/v1',
+    'api_key': 'EMPTY',
+    'generate_cfg': {
+        'max_retries': 3,
+        'temperature': 0.7,
+    },
+}
+
+tools = [
+    {
+        'mcpServers': {
+${mcpServersCode}
+        }
+    },${builtinTools}
+]
+
+SYSTEM_PROMPT = """你是一个本地 AI 助手，负责协助用户完成 ${usecaseNames} 相关的任务。
+
+## 工作原则
+- 执行不可逆操作（删除、覆盖文件）前，先告知用户并获得确认
+- 每完成一个子任务，简洁汇报执行结果
+- 遇到错误时，提供清晰的错误描述和解决建议
+${state.autonomy <= 2 ? '- 每个重要步骤开始前主动询问用户是否继续' : ''}
+${state.loopEnabled ? `
+## Loop Engineering 协议
+- 最多执行 ${state.loopBudget} 轮「计划 → 执行 → 验证 → 修正」
+- 每轮开始先写出本轮目标、动作和验证方法
+- 验证强度：${getVerifyLabel(state.verifyLevel)}
+- 停止条件：${getStopRuleLabel(state.stopRule)}
+- 如果连续两轮没有进展，停止并报告阻塞原因
+` : ''}
+## 工作目录
+/Users/[YOUR_USERNAME]/workspace  # ← 替换为你的实际路径
+"""
+
+bot = Assistant(
+    llm=llm_cfg,
+    function_list=tools,
+    system_message=SYSTEM_PROMPT,
+    name='LocalAgent',
+    description='本地 AI Agent - ${usecaseNames}',
+)
+
+if __name__ == '__main__':
+    print("🚀 Local Agent 已启动 (${rec.name})")
+    print("输入你的任务，或输入 'exit' 退出\\n")
+    messages = []
+    while True:
+        user_input = input("你: ").strip()
+        if user_input.lower() in ('exit', 'quit', '退出'):
+            break
+        if not user_input:
+            continue
+        messages.append({'role': 'user', 'content': user_input})
+        print("\\nAgent 思考中...")
+        for response in bot.run(messages):
+            pass
+        if response:
+            last = response[-1]
+            print(f"\\nAgent: {last.get('content', '')}")
+            messages = response`;
+
+  document.getElementById('code-agent').textContent = agentCode;
+
+  // --- MCP JSON ---
+  const mcpJSON = `{
+  "mcpServers": {
+${generateMCPServersCode(effectiveTools,'    ')}
+  }
+}`;
+  document.getElementById('code-mcp').textContent = mcpJSON;
+
+  // --- System Prompt ---
+  const systemPrompt = `你是一个专注于「${usecaseNames}」的本地 AI 助手。
+
+## 角色定义
+你运行在用户的本地机器上（${deviceName}，${MEM_SIZES[state.memIdx]}GB），所有数据处理都在本地完成，不会上传至云端。
+
+## 核心能力
+${effectiveTools.map(t=>`- ${t.label.replace(/[📁🎭🌐🧠🗃🧮🐍]/,'').trim()}: 已启用`).join('\n')}
+
+## 行为规范
+- 执行前：明确告知将要执行的操作和影响范围
+- 执行中：遇到歧义主动询问，不做假设
+- 执行后：简洁汇报结果，列出已修改的文件或资源
+${state.autonomy <= 2 ? '- 安全优先：涉及写入、删除的操作，必须获得用户明确确认后才能执行' : ''}
+${state.autonomy >= 4 ? '- 高效模式：在明确任务范围内自主执行，仅在遇到不确定情况时打断' : ''}
+${state.loopEnabled ? `
+## Loop Engineering
+${loopProtocol}
+` : ''}
+
+## 工作路径
+- 工作目录: [YOUR_WORKSPACE_PATH]
+- 临时文件: [YOUR_WORKSPACE_PATH]/tmp/
+- 输出文件: [YOUR_WORKSPACE_PATH]/output/
+
+## 输出格式
+回复使用中文，代码块用 Markdown 标注语言。简洁优先，必要时才展开详细说明。`;
+
+  document.getElementById('code-prompt').textContent = systemPrompt;
+  document.getElementById('code-loop').textContent = loopProtocol;
+  document.getElementById('code-plans').textContent = generatePlanCompare(usecaseNames, effectiveTools, rec);
+
+  // --- Install commands ---
+  renderInstallCmd(state.installOS);
+  document.getElementById('code-health').textContent = generateHealthReport(rec, effectiveTools);
+  document.getElementById('code-errors').textContent = generateErrorGuide();
+}
+
+function generateMCPServersCode(tools, indent) {
+  const toolDefs = {
+    filesystem: `"filesystem": {
+${indent}  "command": "npx",
+${indent}  "args": ["-y", "@modelcontextprotocol/server-filesystem", "./workspace"]
+${indent}}`,
+    sqlite: `"sqlite": {
+${indent}  "command": "uvx",
+${indent}  "args": ["mcp-server-sqlite", "--db-path", "./workspace/data.db"]
+${indent}}`,
+    playwright: `"playwright": {
+${indent}  "command": "npx",
+${indent}  "args": ["-y", "@playwright/mcp@latest"]
+${indent}}`,
+    fetch: `"fetch": {
+${indent}  "command": "uvx",
+${indent}  "args": ["mcp-server-fetch"]
+${indent}}`,
+    memory: `"memory": {
+${indent}  "command": "npx",
+${indent}  "args": ["-y", "@modelcontextprotocol/server-memory"]
+${indent}}`,
+    embedding: `"embedding": {
+${indent}  "command": "uvx",
+${indent}  "args": ["embed-rerank", "--model", "Qwen/Qwen3-Embedding-0.6B"]
+${indent}}`,
+    code_interpreter: null,
+  };
+
+  const lines = tools
+    .filter(t => toolDefs[t.key] !== null && toolDefs[t.key] !== undefined)
+    .map(t => `${indent}${toolDefs[t.key]}`);
+
+  // default if none selected
+  if(!lines.length){
+    return `${indent}"filesystem": {
+${indent}  "command": "npx",
+${indent}  "args": ["-y", "@modelcontextprotocol/server-filesystem", "./workspace"]
+${indent}},
+${indent}"memory": {
+${indent}  "command": "npx",
+${indent}  "args": ["-y", "@modelcontextprotocol/server-memory"]
+${indent}}`;
+  }
+  return lines.join(',\n');
+}
+
+function getInstallCmd(os) {
+  const b = computeBudget();
+  const rec = b.rec;
+  const modelId = rec.ollama;
+  const tools = getSelectedTools();
+  const hasPlaywright = tools.some(t=>t.key==='playwright');
+  const osCmds = {
+    mac: `# ── macOS (Apple Silicon) 安装指南 ──────────────────────
+
+# 1. 安装 Ollama（推理服务）
+brew install ollama
+brew services start ollama
+
+# 2. 拉取推荐模型
+ollama pull ${modelId}
+
+# 3. 安装 Python 依赖
+pip install -U "qwen-agent[mcp,gui,rag,code_interpreter]"
+
+# 4. 安装 Node.js（MCP server 需要）
+brew install node
+
+# 5. 安装 uv（Python MCP 工具）
+curl -LsSf https://astral.sh/uv/install.sh | sh${hasPlaywright ? `
+
+# 6. 安装 Playwright 浏览器
+npx playwright install chromium` : ''}
+
+# 6. 验证 Ollama 正常运行
+curl http://localhost:11434/api/tags
+
+# 7. 运行 Agent
+python agent.py`,
+
+    win: `# ── Windows 安装指南 ──────────────────────────────────
+
+# 1. 安装 Ollama（从官网下载）
+# 下载地址: https://ollama.com/download/windows
+
+# 2. 拉取推荐模型（在 PowerShell 中运行）
+ollama pull ${modelId}
+
+# 3. 安装 Python 依赖（需要 Python 3.10+）
+pip install -U "qwen-agent[mcp,gui,rag,code_interpreter]"
+
+# 4. 安装 Node.js（从 nodejs.org 下载）
+# 下载地址: https://nodejs.org/
+
+# 5. 安装 uv
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"${hasPlaywright ? `
+
+# 6. 安装 Playwright 浏览器
+npx playwright install chromium` : ''}
+
+# 7. 运行 Agent
+python agent.py`,
+
+    linux: `# ── Linux (Ubuntu/Debian) 安装指南 ──────────────────
+
+# 1. 安装 Ollama
+curl -fsSL https://ollama.com/install.sh | sh
+sudo systemctl start ollama
+
+# 2. 拉取推荐模型
+ollama pull ${modelId}
+
+# 3. 安装 Python 依赖
+pip install -U "qwen-agent[mcp,gui,rag,code_interpreter]"
+
+# 4. 安装 Node.js
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# 5. 安装 uv
+curl -LsSf https://astral.sh/uv/install.sh | sh${hasPlaywright ? `
+
+# 6. 安装 Playwright 浏览器
+npx playwright install chromium` : ''}
+
+# 7. 运行 Agent
+python agent.py`
+  };
+  return osCmds[os];
+}
+
+function renderInstallCmd(os) {
+  document.getElementById('code-install').textContent = getInstallCmd(os);
+}
+
+function getVerifyLabel(level) {
+  return {
+    light: '轻量验证：确认输出存在、格式合理、没有明显错误',
+    standard: '标准验证：检查关键结果、路径、状态码或返回内容',
+    strict: '严格验证：优先使用测试、截图、日志或可复现命令确认结果'
+  }[level] || '标准验证';
+}
+
+function getStopRuleLabel(rule) {
+  return {
+    success: '达到目标即停止，并汇报最终结果',
+    approval: '每轮结束后等待用户确认再继续',
+    budget: '用完最大轮数后停止，总结完成度和剩余问题'
+  }[rule] || '达到目标即停止';
+}
+
+function generateLoopPlaybook(usecaseNames, tools, rec) {
+  if(!state.loopEnabled) {
+    return `# Loop Engineering 已关闭
+
+当前配置采用一次性执行策略。
+
+建议仍保留两个基本习惯：
+1. 执行前说明计划
+2. 执行后说明结果和风险
+`;
+  }
+
+  const toolNames = tools.map(t=>t.label.replace(/^[^a-zA-Z0-9]+ /,'')).join(', ');
+  const verificationExamples = {
+    light: '- 文件任务：确认目标文件存在\n- 网页任务：确认页面可访问\n- 代码任务：确认命令无明显报错',
+    standard: '- 文件任务：列出修改前后差异\n- 网页任务：检查标题、状态码或关键文本\n- 代码任务：运行相关测试、lint 或最小复现命令',
+    strict: '- 文件任务：生成变更摘要并抽样校验内容\n- 网页任务：截图或保存关键 DOM 证据\n- 代码任务：运行测试、检查日志并验证边界场景'
+  }[state.verifyLevel];
+
+  return `# Loop Engineering Playbook
+
+适用场景：${usecaseNames}
+推荐模型：${rec.name} ${rec.quant}
+可用工具：${toolNames}
+
+## 核心循环
+
+最多执行 ${state.loopBudget} 轮，每轮遵循：
+
+1. Plan
+   - 复述本轮目标
+   - 列出要使用的工具
+   - 明确成功标准
+
+2. Act
+   - 只执行本轮必要动作
+   - 写入、删除、覆盖、提交、联网提交前先确认
+   - 每次动作后保留可追踪证据，例如路径、命令、状态码或摘要
+
+3. Verify
+   - 验证强度：${getVerifyLabel(state.verifyLevel)}
+${verificationExamples}
+
+4. Reflect
+   - 判断是否达成目标
+   - 如果失败，说明失败原因和下一轮修正点
+   - 如果连续两轮没有新进展，停止循环并请求用户决策
+
+## 停止条件
+
+${getStopRuleLabel(state.stopRule)}
+
+额外停止条件：
+- 需要用户凭证、登录、验证码或手动授权
+- 操作可能造成不可逆损失
+- 内存不足、工具链不可用或模型响应明显退化
+
+## 每轮输出格式
+
+### Round N / ${state.loopBudget}
+目标：
+计划：
+执行：
+验证：
+结论：
+下一步：
+
+## 最终输出格式
+
+完成状态：
+已完成：
+未完成：
+证据：
+风险：
+建议下一步：
+`;
+}
+
+function findSmallerModel(currentRec) {
+  const idx = MODEL_RULES.findIndex(rule => rule.name === currentRec.name);
+  return MODEL_RULES[Math.max(0, idx - 1)] || currentRec;
+}
+
+function findLargerModel(currentRec, budget) {
+  const idx = MODEL_RULES.findIndex(rule => rule.name === currentRec.name);
+  const candidate = MODEL_RULES[Math.min(MODEL_RULES.length - 1, idx + 1)] || currentRec;
+  return candidate.memGB <= Math.max(0, budget.totalGB * 0.9 - budget.osGB - budget.toolsGB)
+    ? candidate
+    : currentRec;
+}
+
+function generatePlanCompare(usecaseNames, tools, rec) {
+  const budget = computeBudget();
+  const scores = computeScores();
+  const smaller = findSmallerModel(rec);
+  const larger = findLargerModel(rec, budget);
+  const toolNames = tools.map(t=>t.label.replace(/^[^a-zA-Z0-9]+ /,'')).join(', ');
+  const heavyTools = tools.filter(t=>['playwright','embedding'].includes(t.key)).map(t=>t.key);
+  const conservativeTools = tools.filter(t=>!['playwright','embedding'].includes(t.key));
+  const conservativeToolNames = (conservativeTools.length ? conservativeTools : [{label:'filesystem'}])
+    .map(t=>t.label.replace(/^[^a-zA-Z0-9]+ /,'')).join(', ');
+  const riskLines = [];
+  if(budget.ratio >= 0.9) riskLines.push('- 内存占用接近上限，推荐先跑保守方案。');
+  if(heavyTools.length) riskLines.push(`- ${heavyTools.join(', ')} 属于重工具，可能增加启动时间和内存占用。`);
+  if(state.autonomy >= 4) riskLines.push('- 自主度较高，建议保留写入/删除前确认。');
+  if(!state.loopEnabled) riskLines.push('- Loop Engineering 已关闭，多步任务失败后可能不自动修正。');
+
+  return `# 智能方案对比
+
+用途：${usecaseNames}
+当前内存：${budget.totalGB}GB
+系统占用：~${budget.osGB}GB
+当前工具链：${toolNames}
+
+## 当前推荐方案
+
+模型：${rec.name}
+量化：${rec.quant}
+预计速度：${rec.speed} tok/s
+模型内存：~${rec.memGB}GB
+工具链内存：~${budget.toolsGB.toFixed(1)}GB
+剩余内存：~${budget.freeGB.toFixed(1)}GB
+
+评分：
+- 稳定性：${scores.stability}/100
+- 性能：${scores.performance}/100
+- 安全性：${scores.safety}/100
+- 易上手：${scores.ease}/100
+- 能力上限：${scores.capability}/100
+
+## 保守降级方案
+
+适合：首次运行、低内存、频繁 OOM、非技术用户。
+
+模型：${smaller.name}
+量化：${smaller.quant}
+工具链：${conservativeToolNames}
+Loop：${state.loopEnabled ? '保留，但最大轮数建议 2-3 轮' : '建议开启 2 轮标准验证'}
+自主度：建议 1-2
+
+为什么这样降级：
+- 降低模型内存占用
+- 移除浏览器/Embedding 等重工具
+- 减少自动写入和不可逆操作风险
+
+## 性能优先方案
+
+适合：内存充足、追求更好推理质量、能接受较慢响应。
+
+模型：${larger.name}
+量化：${larger.quant}
+工具链：${toolNames}
+Loop：${state.loopEnabled ? `${state.loopBudget} 轮，${getVerifyLabel(state.verifyLevel)}` : '建议开启 3 轮标准验证'}
+自主度：建议 2-3，避免全自动误操作
+
+注意：
+- 如果性能优先方案和当前模型相同，说明当前内存预算不建议再升级模型。
+- 先完成健康检查，再增加模型大小或工具链。
+
+## 风险提示
+
+${riskLines.length ? riskLines.join('\n') : '- 当前没有明显高风险项，建议先用小任务验证。'}
+
+## 推荐执行顺序
+
+1. 先运行当前推荐方案。
+2. 如果报错或卡顿，切换到保守降级方案。
+3. 如果连续 3 个任务稳定完成，再尝试性能优先方案。
+4. 每次升级只改一个变量：模型、工具链、Loop 轮数不要同时增加。
+`;
+}
+
+function generateHealthReport(rec, tools) {
+  const hasNpx = tools.some(t => ['filesystem','playwright','memory'].includes(t.key));
+  const hasUvx = tools.some(t => ['sqlite','fetch','embedding'].includes(t.key));
+  const hasPlaywright = tools.some(t => t.key === 'playwright');
+  const hasEmbedding = tools.some(t => t.key === 'embedding');
+  const modelId = rec.ollama;
+  return `# Local Agent Wizard 健康检查清单
+
+目标：确认本地模型、依赖和 MCP 工具链都能正常运行。
+Loop Engineering：${state.loopEnabled ? `启用，最多 ${state.loopBudget} 轮，${getVerifyLabel(state.verifyLevel)}` : '关闭'}
+
+## 1. 基础环境
+
+检查 Python:
+python --version
+
+检查 pip:
+pip --version
+
+${hasNpx ? `检查 Node.js / npx:
+node --version
+npx --version
+` : `当前配置不强制需要 npx，但如果后续启用 filesystem/playwright/memory，仍建议安装 Node.js。
+`}
+${hasUvx ? `检查 uv / uvx:
+uv --version
+uvx --version
+` : `当前配置不强制需要 uvx，但 fetch/sqlite/embedding 类 MCP 通常需要它。
+`}
+## 2. Ollama 服务
+
+检查 Ollama 是否安装:
+ollama --version
+
+检查 Ollama 服务是否启动:
+curl http://localhost:11434/api/tags
+
+检查推荐模型是否已下载:
+ollama list | grep "${modelId.split(':')[0]}"
+
+如果没有模型:
+ollama pull ${modelId}
+
+## 3. Python Agent 依赖
+
+检查 Qwen-Agent:
+python - <<'PY'
+import qwen_agent
+print("qwen_agent OK")
+PY
+
+如果失败:
+pip install -U "qwen-agent[mcp,gui,rag,code_interpreter]"
+
+## 4. MCP 工具链
+
+已选择工具:
+${tools.map(t => `- ${t.label.replace(/^[^a-zA-Z0-9]+ /,'')} (~${t.mem}GB)`).join('\n')}
+
+${hasPlaywright ? `Playwright 浏览器依赖:
+npx playwright install chromium
+` : ''}
+${hasEmbedding ? `Embedding 模型会额外占用内存。如果运行变慢或 OOM，先关闭其他应用，或暂时移除 embedding 工具。
+` : ''}
+## 5. 最小可用测试
+
+1. 启动 Ollama
+2. 运行 python agent.py
+3. 输入：请只回复“连接成功”
+4. 再测试一个低风险任务：列出工作目录中的文件，不要修改任何文件
+${state.loopEnabled ? `5. 测试 Loop：要求 Agent 用 1 轮完成一个小任务，并输出 Plan / Act / Verify / Reflect` : ''}
+
+通过标准：
+- 模型能回复
+- 没有 connection refused
+- 没有 model not found
+- MCP 工具没有 spawn / command not found 报错
+`;
+}
+
+function generateErrorGuide() {
+  return `# 常见错误翻译库
+
+1. connection refused / Failed to connect to localhost:11434
+人话解释：Ollama 没启动，或者端口不是 11434。
+怎么修：
+  - macOS: brew services start ollama
+  - Linux: sudo systemctl start ollama
+  - Windows: 打开 Ollama 应用
+  - 然后运行: curl http://localhost:11434/api/tags
+
+2. model not found / pull model first
+人话解释：配置里写了模型，但本机还没下载。
+怎么修：
+  - 运行安装命令里的 ollama pull ...
+  - 再用 ollama list 确认模型存在
+
+3. CUDA out of memory / out of memory / killed
+人话解释：模型或工具链超出显存/内存。
+怎么修：
+  - 降级到更小模型
+  - 关闭浏览器、IDE、视频软件等占内存应用
+  - 暂时移除 embedding 或 playwright
+
+4. spawn npx ENOENT / npx: command not found
+人话解释：Node.js 没装，MCP server 无法启动。
+怎么修：
+  - macOS: brew install node
+  - Windows: 安装 https://nodejs.org/
+  - Linux: sudo apt-get install -y nodejs
+
+5. uvx: command not found
+人话解释：uv 没装，Python MCP 工具无法启动。
+怎么修：
+  - macOS/Linux: curl -LsSf https://astral.sh/uv/install.sh | sh
+  - Windows: powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+6. Permission denied / EACCES
+人话解释：Agent 没有权限读写目标目录。
+怎么修：
+  - 确认 filesystem MCP 的路径是你自己的工作目录
+  - 不要直接指向系统目录，例如 /System、C:\\Windows
+
+7. playwright browser not installed
+人话解释：Playwright 工具装了，但浏览器内核没装。
+怎么修：
+  - npx playwright install chromium
+
+8. JSON parse error / Unexpected token
+人话解释：MCP 配置粘贴时少了逗号、括号或层级不对。
+怎么修：
+  - 整段复制 MCP 配置
+  - 确认外层是 { "mcpServers": { ... } }
+
+9. ModuleNotFoundError: qwen_agent
+人话解释：Python 依赖没装到当前 Python 环境。
+怎么修：
+  - python -m pip install -U "qwen-agent[mcp,gui,rag,code_interpreter]"
+  - 再运行 python -c "import qwen_agent"
+
+10. Agent 能聊天但不能调用工具
+人话解释：模型服务正常，但 MCP server 没启动或配置路径不对。
+怎么修：
+  - 先只保留 filesystem
+  - 检查 command 是否存在
+  - 检查 args 里的目录是否存在
+`;
+}
+
+function switchInstallOS(os, btn) {
+  state.installOS = os;
+  document.querySelectorAll('.install-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const labels = {mac:'BASH — macOS',win:'POWERSHELL — Windows',linux:'BASH — Linux'};
+  document.getElementById('install-os-label').textContent = labels[os];
+  renderInstallCmd(os);
+}
+
+/* ─── TABS ───────────────────────────────────────────────────────────── */
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  const tabMap = {agent:'tab-agent',mcp:'tab-mcp',prompt:'tab-prompt',loop:'tab-loop',plans:'tab-plans',install:'tab-install',health:'tab-health',errors:'tab-errors'};
+  document.getElementById(tabMap[name]).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
+
+/* ─── COPY ───────────────────────────────────────────────────────────── */
+function copyCode(id, btn) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.innerHTML = '<span>✓ 已复制</span>';
+    btn.classList.add('copied');
+    setTimeout(()=>{
+      btn.innerHTML = '<span>复制</span>';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+/* ─── SHAREABLE CONFIG URL ───────────────────────────────────────────── */
+function getShareParams() {
+  const params = new URLSearchParams();
+  params.set('device', state.device);
+  params.set('chip', state.chip);
+  params.set('gpu', state.gpu);
+  params.set('mem', String(MEM_SIZES[state.memIdx]));
+  if(state.osVersion) params.set('os', state.osVersion);
+  if(state.template) params.set('template', state.template);
+  params.set('use', state.usecases.join(','));
+  params.set('target', state.targetTool);
+  params.set('auto', String(state.autonomy));
+  params.set('loop', state.loopEnabled ? '1' : '0');
+  params.set('rounds', String(state.loopBudget));
+  params.set('verify', state.verifyLevel);
+  params.set('stop', state.stopRule);
+  return params;
+}
+
+function updateShareUrl(push = true) {
+  const url = `${location.origin}${location.pathname}?${getShareParams().toString()}`;
+  if(push) history.replaceState(null, '', url);
+  return url;
+}
+
+function copyShareLink(btn) {
+  const url = updateShareUrl(true);
+  navigator.clipboard.writeText(url).then(()=>{
+    btn.textContent = '✓ 已复制链接';
+    setTimeout(()=>{ btn.textContent = '🔗 复制分享链接'; }, 2000);
+  });
+}
+
+function restoreFromUrl() {
+  const params = new URLSearchParams(location.search);
+  if(!params.size) return;
+  const mem = Number(params.get('mem'));
+  const memIdx = MEM_SIZES.indexOf(mem);
+  state.device = params.get('device') || state.device;
+  state.chip = params.get('chip') || state.chip;
+  state.gpu = params.get('gpu') || state.gpu;
+  state.memIdx = memIdx >= 0 ? memIdx : state.memIdx;
+  state.osVersion = params.get('os') || '';
+  state.template = params.get('template') || '';
+  state.usecases = (params.get('use') || '').split(',').filter(Boolean).slice(0,3);
+  state.targetTool = params.get('target') || state.targetTool;
+  state.autonomy = Math.min(Math.max(Number(params.get('auto')) || state.autonomy, 1), 5);
+  state.loopEnabled = params.get('loop') !== '0';
+  state.loopBudget = [2,3,5].includes(Number(params.get('rounds'))) ? Number(params.get('rounds')) : state.loopBudget;
+  state.verifyLevel = ['light','standard','strict'].includes(params.get('verify')) ? params.get('verify') : state.verifyLevel;
+  state.stopRule = ['success','approval','budget'].includes(params.get('stop')) ? params.get('stop') : state.stopRule;
+  syncFormFromState();
+}
+
+/* ─── DOWNLOAD ───────────────────────────────────────────────────────── */
+function downloadAll() {
+  generateOutputs();
+  const files = [
+    {name:'agent.py', content: document.getElementById('code-agent').textContent},
+    {name:'mcp-settings.json', content: document.getElementById('code-mcp').textContent},
+    {name:'system-prompt.txt', content: document.getElementById('code-prompt').textContent},
+    {name:'loop-playbook.md', content: document.getElementById('code-loop').textContent},
+    {name:'plan-compare.md', content: document.getElementById('code-plans').textContent},
+    {name:'install-mac.sh', content: getInstallCmd('mac')},
+    {name:'install-windows.ps1', content: getInstallCmd('win')},
+    {name:'install-linux.sh', content: getInstallCmd('linux')},
+    {name:'health-check.md', content: document.getElementById('code-health').textContent},
+    {name:'error-guide.md', content: document.getElementById('code-errors').textContent},
+    {name:'memory-budget.json', content: JSON.stringify(computeBudget(), null, 2)},
+  ];
+  const blob = buildZip(files);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'local-agent-wizard-config.zip';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+let CRC_TABLE;
+function crc32(bytes) {
+  CRC_TABLE ||= Array.from({length:256}, (_, n) => {
+    let c = n;
+    for (let k = 0; k < 8; k += 1) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    return c >>> 0;
+  });
+  let crc = 0xffffffff;
+  for (const byte of bytes) crc = CRC_TABLE[(crc ^ byte) & 0xff] ^ (crc >>> 8);
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function buildZip(files) {
+  const encoder = new TextEncoder();
+  const localParts = [];
+  const centralParts = [];
+  let offset = 0;
+  const now = new Date();
+  const dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | Math.floor(now.getSeconds() / 2);
+  const dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+  const u16 = n => [n & 255, (n >>> 8) & 255];
+  const u32 = n => [n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255];
+  const part = arr => Uint8Array.from(arr);
+
+  for (const file of files) {
+    const nameBytes = encoder.encode(file.name);
+    const data = encoder.encode(file.content);
+    const crc = crc32(data);
+    const localHeader = part([
+      ...u32(0x04034b50), ...u16(20), ...u16(0), ...u16(0), ...u16(dosTime), ...u16(dosDate),
+      ...u32(crc), ...u32(data.length), ...u32(data.length), ...u16(nameBytes.length), ...u16(0),
+    ]);
+    localParts.push(localHeader, nameBytes, data);
+
+    const centralHeader = part([
+      ...u32(0x02014b50), ...u16(20), ...u16(20), ...u16(0), ...u16(0), ...u16(dosTime), ...u16(dosDate),
+      ...u32(crc), ...u32(data.length), ...u32(data.length), ...u16(nameBytes.length), ...u16(0), ...u16(0),
+      ...u16(0), ...u16(0), ...u32(0), ...u32(offset),
+    ]);
+    centralParts.push(centralHeader, nameBytes);
+    offset += localHeader.length + nameBytes.length + data.length;
+  }
+
+  const centralSize = centralParts.reduce((sum, item) => sum + item.length, 0);
+  const endRecord = part([
+    ...u32(0x06054b50), ...u16(0), ...u16(0), ...u16(files.length), ...u16(files.length),
+    ...u32(centralSize), ...u32(offset), ...u16(0),
+  ]);
+  return new Blob([...localParts, ...centralParts, endRecord], {type:'application/zip'});
+}
+
+/* ─── THEME TOGGLE ───────────────────────────────────────────────────── */
+(function(){
+  const t = document.querySelector('[data-theme-toggle]');
+  const r = document.documentElement;
+  let d = r.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+  r.setAttribute('data-theme', d);
+  function updateIcon(){
+    if(!t) return;
+    t.innerHTML = d === 'dark'
+      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  }
+  updateIcon();
+  if(t) t.addEventListener('click',()=>{
+    d = d === 'dark' ? 'light' : 'dark';
+    r.setAttribute('data-theme', d);
+    updateIcon();
+  });
+})();
+
+/* ─── INIT ───────────────────────────────────────────────────────────── */
+restoreFromUrl();
+renderBudget();
+renderRec();
+toggleLoopSettings();
+document.getElementById('mem-val-label').textContent = `— ${MEM_SIZES[state.memIdx]} GB`;
+</script>
+<script src="analytics.js"></script>
+</body>
+</html>

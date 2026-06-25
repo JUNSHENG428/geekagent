@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Windows + NVIDIA 本地 AI Agent 教程</title>
+  <meta name="description" content="Windows NVIDIA 显卡用户如何按 VRAM 选择本地模型、配置 Ollama、Cursor MCP 和 Agent 工具链。">
+  <link rel="canonical" href="https://localagentwizard.com/guides/windows-nvidia-agent.html">
+  <link rel="stylesheet" href="../site.css">
+</head>
+<body>
+<nav class="nav"><div class="wrap nav-inner"><a class="brand" href="../index.html"><span class="mark">L</span><span>Local Agent Wizard</span></a><div class="nav-links"><a href="../local-agent-wizard.html">开始生成</a><a href="../diagnose.html">报错诊断</a><a href="index.html">教程</a><a href="../advertise.html">合作</a><a href="../faq.html">FAQ</a></div></div></nav>
+<main class="article"><div class="wrap">
+  <div class="eyebrow">Windows NVIDIA</div>
+  <h1>Windows + NVIDIA 如何搭建本地 AI Agent</h1>
+  <p class="lead">Windows 用户最重要的是显存预算。显存越小，越要控制模型大小、上下文长度和工具链数量。</p>
+  <h2>按显存选择模型</h2>
+  <ul>
+    <li>8GB VRAM：Qwen3 1.7B / Qwen3 8B Q4，适合轻量 Agent。</li>
+    <li>12GB VRAM：Qwen3 8B 或 Qwen2.5-Coder 14B Q4，适合代码辅助。</li>
+    <li>16GB VRAM：14B 模型更稳，也可以加 Playwright。</li>
+    <li>24GB+ VRAM：可尝试更大模型和多工具链。</li>
+  </ul>
+  <h2>安装顺序</h2>
+  <ol>
+    <li>安装 NVIDIA 驱动。</li>
+    <li>安装 Ollama Windows 版。</li>
+    <li>安装 Python 3.10+ 和 Node.js。</li>
+    <li>用 Wizard 生成配置。</li>
+  </ol>
+  <pre>ollama pull qwen3:8b
+pip install -U "qwen-agent[mcp,gui,rag,code_interpreter]"
+npx --version</pre>
+  <h2>常见问题</h2>
+  <p>如果出现 CUDA out of memory，先降级模型，再减少工具链。网页自动化和 embedding 都会增加内存压力。</p>
+  <div class="ad-slot" data-ad-slot="guide-affiliate"></div>
+  <p><a class="btn primary" href="../local-agent-wizard.html">根据你的显卡生成配置</a></p>
+  <div data-comments="guides/windows-nvidia-agent"></div>
+</div></main>
+<footer class="footer"><div class="wrap footer-grid"><span>Local Agent Wizard</span><span><a href="index.html">教程目录</a></span></div></footer>
+<script src="../analytics.js"></script>
+<script src="../ads.js"></script>
+<script src="../comments.js"></script>
+</body></html>

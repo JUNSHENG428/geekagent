@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Local Agent Wizard - 本地 AI Agent 配置生成器</title>
+  <meta name="description" content="输入电脑配置和使用场景，自动生成 Ollama、Cursor MCP、Qwen-Agent、本地数据库和插件接入建议。适合本地 AI Agent 新手。">
+  <meta name="keywords" content="本地 AI Agent,Ollama 配置,Cursor MCP,Qwen-Agent,Supabase,本地模型推荐,Loop Engineering">
+  <meta property="og:title" content="Local Agent Wizard">
+  <meta property="og:description" content="5 分钟生成可运行的本地 AI Agent 配置包，并规划数据库和插件接入。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://localagentwizard.com/">
+  <link rel="canonical" href="https://localagentwizard.com/">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#4fb3a8">
+  <link rel="stylesheet" href="site.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Local Agent Wizard","applicationCategory":"DeveloperApplication","operatingSystem":"macOS, Windows, Linux","description":"Generate local AI agent configuration packages, database plans and plugin integration guidance for Ollama, Cursor MCP and local workflows.","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+  </script>
+</head>
+<body>
+  <nav class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="index.html"><span class="mark">L</span><span>Local Agent Wizard</span></a>
+      <div class="nav-links">
+        <a href="local-agent-wizard.html">开始生成</a>
+        <a href="templates.html">模板包</a>
+        <a href="integrations.html">插件与数据库</a>
+        <a href="diagnose.html">报错诊断</a>
+        <a href="guides/index.html">教程</a>
+        <a href="pricing.html">定价</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="wrap hero-panel">
+        <div>
+          <div class="eyebrow">Local AI Agent Setup Hub</div>
+          <h1>把本地 AI Agent 从配置表变成可运行系统。</h1>
+          <p class="lead">生成 Ollama 模型建议、Cursor MCP 配置、Qwen-Agent 脚本、健康检查、数据库 schema 和插件接入路线。适合从个人工具走向可运营产品。</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="local-agent-wizard.html">免费生成配置包</a>
+            <a class="btn" href="integrations.html">查看插件路线</a>
+            <a class="btn" href="diagnose.html">粘贴报错诊断</a>
+          </div>
+          <div class="trust-row">
+            <span>纯前端可用</span>
+            <span>本地隐私优先</span>
+            <span>支持商业化扩展</span>
+          </div>
+        </div>
+        <figure class="hero-visual">
+          <img src="assets/hero-dashboard.png" alt="Local Agent Wizard dashboard preview">
+        </figure>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap metrics">
+        <div class="metric"><strong>5 min</strong><span>完成本地 Agent 初始配置</span></div>
+        <div class="metric"><strong>6 类</strong><span>覆盖模型、MCP、脚本、诊断、数据、插件</span></div>
+        <div class="metric"><strong>0 上传</strong><span>静态版默认不上传用户配置</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap split">
+        <div>
+          <h2>先让用户跑起来，再把数据沉淀下来。</h2>
+          <p class="lead">当前站点已经有配置生成、报错诊断、模板包和教程。下一步要补的是用户反馈、订阅、模板购买、诊断工单和事件分析的数据闭环。</p>
+          <ul class="feature-list">
+            <li><strong>配置生成：</strong>记录匿名硬件画像和推荐结果，用于优化规则表。</li>
+            <li><strong>留言反馈：</strong>从本地 localStorage 升级到可审核的云端评论。</li>
+            <li><strong>商业转化：</strong>把候补名单、购买记录、诊断预约统一入库。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="eyebrow">Recommended Stack</div>
+          <h3>优先接这 5 个插件</h3>
+          <p>Supabase 做数据库和认证，Resend 做邮件，Stripe 或 Lemon Squeezy 做支付，PostHog 做产品分析，Giscus 做轻量评论。</p>
+          <p style="margin-top:18px"><a class="btn primary" href="integrations.html">打开接入清单</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <h2>核心工作流</h2>
+        <div class="workflow">
+          <div class="card"><h3>输入硬件</h3><p>选择系统、内存、显存、工具偏好和自主程度。</p></div>
+          <div class="card"><h3>生成配置</h3><p>输出模型建议、MCP JSON、脚本、Prompt 和健康检查。</p></div>
+          <div class="card"><h3>诊断报错</h3><p>把 Ollama、MCP、Python 报错映射成可执行修复步骤。</p></div>
+          <div class="card"><h3>沉淀数据</h3><p>记录匿名事件、订阅、评论、模板订单和诊断工单。</p></div>
+          <div class="card"><h3>商业交付</h3><p>通过模板包、诊断服务和企业部署咨询获得收入。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <h2>从免费工具到付费交付</h2>
+        <div class="grid cards">
+          <a class="card" href="local-agent-wizard.html"><h3>免费配置生成</h3><p>先生成模型、MCP、Prompt、安装命令和 Loop Playbook。</p></a>
+          <a class="card" href="templates.html"><h3>高级模板包</h3><p>把配置变成文件整理、网页监控、代码审查等真实工作流。</p></a>
+          <a class="card" href="diagnose.html"><h3>报错粘贴诊断</h3><p>遇到 Ollama、MCP、Qwen-Agent 报错时快速定位问题。</p></a>
+          <a class="card" href="pricing.html"><h3>诊断与咨询</h3><p>为高意图用户提供一对一配置诊断和企业部署咨询。</p></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap split">
+        <div>
+          <h2>热门教程</h2>
+          <div class="grid cards">
+            <a class="card" href="guides/mac-local-agent.html"><h3>Mac 搭建本地 AI Agent</h3><p>M 系列芯片如何选择 Ollama / MLX 路线。</p></a>
+            <a class="card" href="guides/windows-nvidia-agent.html"><h3>Windows + NVIDIA 教程</h3><p>显存预算、模型选择和常见 CUDA 问题。</p></a>
+            <a class="card" href="guides/cursor-mcp-config.html"><h3>Cursor MCP 配置教程</h3><p>如何把生成的 MCP JSON 放进 Cursor。</p></a>
+            <a class="card" href="guides/ollama-errors.html"><h3>Ollama 报错合集</h3><p>connection refused、model not found、OOM 的人话解释。</p></a>
+          </div>
+        </div>
+        <aside class="ad-slot" data-ad-slot="default"></aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap card">
+        <h2>上线后如何沉淀用户？</h2>
+        <p class="muted">先收集邮箱、硬件配置反馈、报错类型和模板需求，再决定是否做高级模板包、课程或一对一配置诊断。</p>
+        <form class="newsletter" action="mailto:hello@localagentwizard.com" method="post" enctype="text/plain">
+          <input name="email" type="email" placeholder="输入邮箱，获取模板更新和插件接入清单">
+          <button class="btn primary" type="submit">订阅更新</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <span>Local Agent Wizard · 纯客户端配置生成器</span>
+      <span><a href="integrations.html">插件与数据库</a> · <a href="privacy.html">隐私</a> · <a href="faq.html">FAQ</a></span>
+    </div>
+  </footer>
+<script src="analytics.js"></script>
+<script src="ads.js"></script>
+</body>
+</html>
