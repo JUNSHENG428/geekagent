@@ -1,0 +1,76 @@
+name: Import static site from Vercel
+
+on:
+  push:
+    paths:
+      - .github/workflows/import-from-vercel.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download deployed files
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://tool-nu-bay.vercel.app"
+          files=(
+            "404.html"
+            "_headers"
+            "_redirects"
+            "ads.js"
+            "advertise.html"
+            "analytics.js"
+            "assets/hero-dashboard.png"
+            "comments.js"
+            "diagnose.html"
+            "docs/database-schema.sql"
+            "docs/media-kit.md"
+            "docs/operations.md"
+            "docs/plugin-roadmap.md"
+            "faq.html"
+            "favicon.svg"
+            "guides/cursor-mcp-config.html"
+            "guides/index.html"
+            "guides/mac-local-agent.html"
+            "guides/model-memory-guide.html"
+            "guides/ollama-errors.html"
+            "guides/windows-nvidia-agent.html"
+            "index.html"
+            "integrations.html"
+            "llms.txt"
+            "local-agent-wizard.html"
+            "manifest.webmanifest"
+            "pricing.html"
+            "privacy.html"
+            "robots.txt"
+            "site.css"
+            "sitemap.xml"
+            "templates.html"
+            "vercel.json"
+          )
+          for file in "${files[@]}"; do
+            mkdir -p "$(dirname "$file")"
+            curl --fail --location --silent --show-error "$BASE/$file" --output "$file"
+          done
+          printf '.vercel\n' > .gitignore
+      - name: Commit imported site
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Import static site from Vercel"
+            git push
+          fi
