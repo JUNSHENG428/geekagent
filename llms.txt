@@ -10,6 +10,7 @@ Local Agent Wizard is a static web tool for generating local AI Agent configurat
 - Guides: https://localagentwizard.com/guides/
 - Templates: https://localagentwizard.com/templates.html
 - Pricing: https://localagentwizard.com/pricing.html
+- Integrations: https://localagentwizard.com/integrations.html
 
 ## What This Site Helps With
 
